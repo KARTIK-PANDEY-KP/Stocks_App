@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Stocks</string>
-    <string name="title_top_str">Stocks</string>
+    <string name="title_top_str">Stocks1</string>
     <string name="curdate">curdate</string>
     <string name="PORTFOLIO">PORTFOLIO</string>
+    <string name="NetWorth">Net Worth</string>
+    <string name="CashBalance">Cash Balance</string>
+    <string name="favorite">FAVORITES\n</string>
 </resources>
