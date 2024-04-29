@@ -1,7 +1,9 @@
 package com.example.stock;
 
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -45,6 +47,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private Runnable runnable;
+    private int value = -1;
 
     private RequestQueue requestQueue;  // Declare the RequestQueue.
     private ProgressBar progressBar; // Declare the ProgressBar.
@@ -60,9 +63,6 @@ public class MainActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(this);
         adapter_home adapter = new adapter_home(this,favouritesmodels);
         adapter_home_port adapter2 = new adapter_home_port(this,portfoliomodels);
-
-        // Fetch data from server
-        fetchPortfolioData(adapter, adapter2);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -85,19 +85,53 @@ public class MainActivity extends AppCompatActivity {
         Toolbar mActionBarToolbar = findViewById(R.id.toolbar2);
         mActionBarToolbar.setTitle("Stocks");
         setSupportActionBar(mActionBarToolbar); // Correct usage
+        Toolbar mActionBarToolbar_spinner = findViewById(R.id.toolbar);
+        mActionBarToolbar_spinner.setTitle("Stocks");
 
         String date_n = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(new Date());
         TextView date  = findViewById(R.id.curdate);
         date.setText(date_n);
 
+        setVisibilityForAllViews(View.GONE);
 
+        fetchPortfolioData(adapter, adapter2);
+//        value.setValue(2);
+    }
+    public void setValue(int newValue) {
+        if (newValue != this.value) {
+            this.value = newValue;
+            onValueChanged(newValue);
+        }
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    private void onValueChanged(int newValue) {
+        // Code to execute when the value changes
+        System.out.println("Value changed to: " + newValue);
+        if(newValue == 2) {
+            setVisibilityForAllViews(View.VISIBLE);
+        }
+        else if(newValue == -1) {
+            setVisibilityForAllViews(View.GONE);
+        }
+        else {
+        }
+        // You can add more logic here as needed
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search, menu); // Inflate the menu with the search item
         MenuItem searchItem = menu.findItem(R.id.action_search);
 
+//        SearchView searchView = (SearchView) searchItem.getActionView();
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) searchItem.getActionView();
+
+// Assumes current activity is the searchable activity
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         setupSearchView(searchView);
 
 
@@ -109,7 +143,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // Perform final search
-                return false;
+                Log.d("SUBMIT", query);
+                Intent callsearchactivity = new Intent(MainActivity.this, searchactivity.class);
+                callsearchactivity.putExtra("query", query);
+                startActivity(callsearchactivity);
+                searchView.clearFocus(); // Add this line
+                return true;
             }
             @Override
             public boolean onQueryTextChange(String newText) {
@@ -131,6 +170,29 @@ public class MainActivity extends AppCompatActivity {
 //                    fetchSearchSuggestions(newText, searchView);
 //                }
 //                return true;
+            }
+        });
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return true;
+            }
+            @Override
+            public boolean onSuggestionClick(int position) {
+                // Get the selected suggestion's text or data
+                Cursor cursor = (Cursor) searchView.getSuggestionsAdapter().getItem(position);
+                int indexColumnSuggestion = cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1);
+                String suggestion = cursor.getString(indexColumnSuggestion);
+
+                // Create an Intent to start the searchactivity with the selected suggestion
+                Intent intent = new Intent(MainActivity.this, searchactivity.class);
+                Log.d("SUBMIT_SUGGESTION", suggestion.split("\\|")[0].trim()); // Outputs: NVDA from NVDA | NVIDIA CORP
+                intent.putExtra("query", suggestion.split("\\|")[0].trim()); // Outputs: NVDA from NVDA | NVIDIA CORP
+                startActivity(intent);
+
+                // Clear focus and close the search view
+                searchView.clearFocus();
+                return true;
             }
         });
     }
@@ -193,9 +255,9 @@ public class MainActivity extends AppCompatActivity {
                 response -> {
                     Log.d("Response", response.toString());
                     updateUI_port(response, adapter2);
+                    setValue(getValue() + 1);
                 }, error -> {
             Log.e("Error", error.toString());
-            progressBar.setVisibility(View.GONE); // Ensure the ProgressBar is hidden on error.
             showErrorMessage(error);
         });
 
@@ -203,10 +265,12 @@ public class MainActivity extends AppCompatActivity {
                 response -> {
                     Log.d("Response_fav", response.toString());
                     updateUI_fav(response, adapter);
+                    setValue(getValue() + 1);
+
                 }, error -> {
             Log.e("Error", error.toString());
 
-            progressBar.setVisibility(View.GONE); // Ensure the ProgressBar is hidden on error.
+
             showErrorMessage(error);
         });
 
@@ -250,10 +314,10 @@ public class MainActivity extends AppCompatActivity {
 
                         recyclerView.setAdapter(adapter);
                         recyclerView.setLayoutManager( new LinearLayoutManager(this));
-
+                        setValue(getValue() + 1);
                     }, error -> {
                 Log.e("Error", error.toString());
-                progressBar.setVisibility(View.GONE); // Ensure the ProgressBar is hidden on error.
+
                 showErrorMessage(error);
             });
 
@@ -359,6 +423,44 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }
 //    }
+    private void setVisibilityForAllViews(int visibility) {
+        findViewById(R.id.divider).setVisibility(visibility);
+        findViewById(R.id.curdate).setVisibility(visibility);
+        findViewById(R.id.Portfolio_title).setVisibility(visibility);
+        findViewById(R.id.textView3).setVisibility(visibility);
+        findViewById(R.id.textView4).setVisibility(visibility);
+        findViewById(R.id.networth).setVisibility(visibility);
+        findViewById(R.id.cashbalance).setVisibility(visibility);
+        findViewById(R.id.textView5).setVisibility(visibility);
+        findViewById(R.id.finnhublink).setVisibility(visibility);
+        findViewById(R.id.rvportfolio).setVisibility(visibility);
+        findViewById(R.id.rvfavourite).setVisibility(visibility);
+        findViewById(R.id.toolbar2).setVisibility(visibility);
+        int oppositeVisibility = (visibility == View.VISIBLE) ? View.GONE : View.VISIBLE;
+        findViewById(R.id.toolbar2).setVisibility(oppositeVisibility);
+        findViewById(R.id.divider3).setVisibility(oppositeVisibility);
 
+        final View imageview = findViewById(R.id.imageView);
+        final View progressbar = findViewById(R.id.progressBar);
+
+        if(oppositeVisibility == View.GONE){
+            progressbar.setVisibility(oppositeVisibility);
+            imageview.setVisibility(oppositeVisibility);
+        }
+        else {
+            progressbar.setVisibility(visibility);
+            imageview.setVisibility(oppositeVisibility);
+
+            // Handler to add delay for the divider visibility change
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Set visibility of divider after 200ms delay
+                    imageview.setVisibility(visibility);
+                    progressbar.setVisibility(oppositeVisibility);
+                }
+            },  800); // Delay in milliseconds
+        }
+    }
 }
 
