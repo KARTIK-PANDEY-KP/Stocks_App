@@ -9,6 +9,7 @@ activity = "1.8.0"
 constraintlayout = "2.1.4"
 volley = "1.2.1"
 recyclerviewSwipedecorator = "1.4"
+okhttp = "5.0.0-alpha.14"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -20,6 +21,7 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 recyclerview-swipedecorator = { group = "it.xabaras.android", name = "recyclerview-swipedecorator", version.ref = "recyclerviewSwipedecorator" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.0" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

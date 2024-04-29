@@ -1,9 +1,15 @@
 package com.example.stock;
 
+import android.app.SearchManager;
 import android.content.Intent;
+import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.BaseColumns;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -11,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -36,6 +43,9 @@ import java.util.Date;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+    private Handler handler = new Handler();
+    private Runnable runnable;
+
     private RequestQueue requestQueue;  // Declare the RequestQueue.
     private ProgressBar progressBar; // Declare the ProgressBar.
     ArrayList<portfoliomodel> portfoliomodels = new ArrayList<>();
@@ -68,15 +78,112 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }
+
         });
+
+
         Toolbar mActionBarToolbar = findViewById(R.id.toolbar2);
+        mActionBarToolbar.setTitle("Stocks");
         setSupportActionBar(mActionBarToolbar); // Correct usage
-        mActionBarToolbar.setTitle("My title");
 
         String date_n = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(new Date());
         TextView date  = findViewById(R.id.curdate);
         date.setText(date_n);
+
+
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search, menu); // Inflate the menu with the search item
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        setupSearchView(searchView);
+
+
+        return true;
+    }
+
+    private void setupSearchView(SearchView searchView) {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Perform final search
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                handler.removeCallbacks(runnable);
+                runnable = () -> {
+                    if (!newText.isEmpty()) {
+                        flushAndFetchSearchSuggestions(newText, searchView);
+                    }
+                    else{
+                        ExampleCursorAdapter adapter = (ExampleCursorAdapter) searchView.getSuggestionsAdapter();
+                        if (adapter != null) {
+                            adapter.flushData();  // Flush data if text is empty
+                        }
+                    }
+                };
+                handler.postDelayed(runnable, 0); // Delay the execution by 300 milliseconds
+                return true;
+//                if (!newText.isEmpty()) {
+//                    fetchSearchSuggestions(newText, searchView);
+//                }
+//                return true;
+            }
+        });
+    }
+
+    private void flushAndFetchSearchSuggestions(String text, SearchView searchView) {
+        // Close and clear any existing suggestions before fetching new ones
+        ExampleCursorAdapter adapter = (ExampleCursorAdapter) searchView.getSuggestionsAdapter();
+        if (adapter != null) {
+            adapter.flushData();
+        }
+
+        fetchSearchSuggestions(text, searchView);
+    }
+    private void fetchSearchSuggestions(String text, SearchView searchView) {
+        String suggestionUrl = "https://nodeserverass3.wl.r.appspot.com/search?q=" + Uri.encode(text);
+        MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1 });
+        searchView.setSuggestionsAdapter(new ExampleCursorAdapter(this, cursor));
+
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, suggestionUrl, null,
+                response -> {
+                    Log.d("Suggestions", response.toString());
+                    try {
+                        for (int i = 0; i < response.length(); i++) {
+                            String suggestion = response.getString(i);
+                            cursor.addRow(new Object[]{i, suggestion});
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    searchView.setSuggestionsAdapter(new ExampleCursorAdapter(this, cursor));
+//                    updateSuggestions(response, searchView);
+                },
+                error -> Log.e("Error", error.toString())
+        );
+
+        // Assuming you have a RequestQueue initialized somewhere in your activity
+        requestQueue.add(jsonArrayRequest);
+    }
+//    private void updateSuggestions(JSONArray suggestions, SearchView searchView) {
+//        MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1 });
+//        try {
+//            for (int i = 0; i < suggestions.length(); i++) {
+//                String suggestion = suggestions.getString(i);
+//                cursor.addRow(new Object[]{i, suggestion});
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//
+//        searchView.setSuggestionsAdapter(new ExampleCursorAdapter(this, cursor));
+//    }
+
 
     private void fetchPortfolioData(adapter_home adapter,adapter_home_port adapter2) {
         String url = "https://nodeserverass3.wl.r.appspot.com/fetch_big";
