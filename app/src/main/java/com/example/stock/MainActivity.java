@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
         if (stocks != null && stocks.length() > 0) {
             for (int i = 0; i < stocks.length(); i++) {
                 JSONObject stock = stocks.getJSONObject(i);
-                double quantityOwned = stock.optDouble("quantity_owned");
+                int quantityOwned = stock.optInt("quantity_owned");
                 double currentPrice = stock.optDouble("currentPrice");
                 double avgPricePerShare = stock.optDouble("stock_avg_price_per_share");
 
