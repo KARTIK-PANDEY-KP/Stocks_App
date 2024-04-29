@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
         double moneyInWallet = response.optDouble("moneyInWallet", 0);
         JSONArray stocks = response.optJSONArray("stocks");
         double netWorth = calculateNetWorth(stocks, moneyInWallet, adapter2);
-        networth.setText(String.format(Locale.US, "%.2f", netWorth));
+        networth.setText(String.format(Locale.US, "$%.2f", netWorth));
     }
 
     private double calculateNetWorth(JSONArray stocks, double initialNetWorth, adapter_home_port adapter2) throws JSONException {
@@ -331,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void parseAndDisplayCashBalance(JSONObject response, TextView cashbalance) {
         double moneyInWallet = response.optDouble("moneyInWallet", 0);
-        cashbalance.setText(String.format(Locale.US, "%.2f", moneyInWallet));
+        cashbalance.setText(String.format(Locale.US, "$%.2f", moneyInWallet));
     }
 
     private void showErrorMessage(VolleyError error) {
