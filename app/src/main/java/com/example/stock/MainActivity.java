@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,20 +46,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-//        RecyclerView recyclerView = findViewById(R.id.rvportfolio);
         // Initialize the RequestQueue
         requestQueue = Volley.newRequestQueue(this);
         adapter_home adapter = new adapter_home(this,favouritesmodels);
         adapter_home_port adapter2 = new adapter_home_port(this,portfoliomodels);
 
-
         // Fetch data from server
         fetchPortfolioData(adapter, adapter2);
-
-//        recyclerView.setAdapter(adapter);
-//
-//        recyclerView.setLayoutManager( new LinearLayoutManager(this));
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -91,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
                     Log.d("Response", response.toString());
-                    updateUI(response, adapter2);
+                    updateUI_port(response, adapter2);
                 }, error -> {
             Log.e("Error", error.toString());
             progressBar.setVisibility(View.GONE); // Ensure the ProgressBar is hidden on error.
@@ -124,12 +118,28 @@ public class MainActivity extends AppCompatActivity {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, get_quote_url + ticker, null,
                     response_quote -> {
                         Log.d("Response_quote_fav", response_quote.toString());
-                        String curr_price = "$" + response_quote.optString("c");
+                        String curr_price = "$" + String.format(Locale.US, "%.2f", response_quote.optDouble("c"));
                         String change = response_quote.optString("d");
                         String percent_change = response_quote.optString("dp");
                         String result = String.format(Locale.US, "$%.2f (%.2f%%)", Double.parseDouble(change), Double.parseDouble(percent_change));
-                        favouritesmodels.add(new favouritesmodel(company_name, ticker, result, curr_price, R.drawable.trending_up));
+                        // Trending up or down sign logic
+                        if(Double.parseDouble(percent_change)>0) {
+                            favouritesmodels.add(new favouritesmodel(company_name, ticker, result, curr_price, R.drawable.trending_up, 2));
+                        }
+                        else if(Double.parseDouble(percent_change)<0) {
+                            favouritesmodels.add(new favouritesmodel(company_name, ticker, result, curr_price, R.drawable.trending_down, 1));
+                        }
+                        else {
+                            favouritesmodels.add(new favouritesmodel(company_name, ticker, result, curr_price, R.color.white, 0));
+                        }
+                        // ------------------------------
+
                         RecyclerView recyclerView = findViewById(R.id.rvfavourite);
+
+                        ItemTouchHelper.Callback callback = new swipeAndDeleteHelper(adapter, this);
+                        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+                        adapter.setTouchHelper(itemTouchHelper);
+                        itemTouchHelper.attachToRecyclerView(recyclerView);
 
                         recyclerView.setAdapter(adapter);
                         recyclerView.setLayoutManager( new LinearLayoutManager(this));
@@ -145,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateUI(JSONObject response, adapter_home_port adapter2) {
+    private void updateUI_port(JSONObject response, adapter_home_port adapter2) {
         TextView networth = findViewById(R.id.networth);
         TextView cashbalance = findViewById(R.id.cashbalance);
         try {
@@ -178,17 +188,35 @@ public class MainActivity extends AppCompatActivity {
                 double valueChange = (currentPrice - avgPricePerShare) * quantityOwned;
                 double percentChange = (valueChange / (avgPricePerShare * quantityOwned)) * 100;
 
-                String result = String.format(Locale.US, "$%.2f (%.2f%%)", valueChange, percentChange);
-                portfoliomodels.add(new portfoliomodel(String.valueOf(quantityOwned) + " shares", stock.optString("stock_ticker"), "$" + result, "$" + String.valueOf(value), R.drawable.trending_down));
+                String result = String.format(Locale.US, "%.2f (%.2f%%)", valueChange, percentChange);
+
+                // Trending up or down sign logic
+                if(percentChange>0) {
+                    portfoliomodels.add(new portfoliomodel(String.valueOf(quantityOwned) + " shares", stock.optString("stock_ticker"), "$" + result, "$" + String.format(Locale.US, "%.2f", value), R.drawable.trending_up, 2));
+                }
+                else if(percentChange<0) {
+                    portfoliomodels.add(new portfoliomodel(String.valueOf(quantityOwned) + " shares", stock.optString("stock_ticker"), "$" + result, "$" + String.format(Locale.US, "%.2f", value), R.drawable.trending_down, 1));
+                }
+                else {
+                    portfoliomodels.add(new portfoliomodel(String.valueOf(quantityOwned) + " shares", stock.optString("stock_ticker"), "$" + result, "$" + String.format(Locale.US, "%.2f", value), R.color.white, 0));
+                }
+                // ------------------------------
                 RecyclerView recyclerView = findViewById(R.id.rvportfolio);
 
+                ItemTouchHelper.Callback callback = new swipeAndDeleteHelper(adapter2, this);
+                ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+                adapter2.setTouchHelper(itemTouchHelper);
+                itemTouchHelper.attachToRecyclerView(recyclerView);
+
                 recyclerView.setAdapter(adapter2);
-                recyclerView.setLayoutManager( new LinearLayoutManager(this){
-                    @Override
-                    public boolean canScrollVertically(){
-                        return false;
-                    }
-                });
+                recyclerView.setLayoutManager( new LinearLayoutManager(this)
+//                { //TODO: SCROLLER
+//                    @Override
+//                    public boolean canScrollVertically(){
+//                        return false;
+//                    }
+//                }
+                );
             }
         }
         return netWorth;

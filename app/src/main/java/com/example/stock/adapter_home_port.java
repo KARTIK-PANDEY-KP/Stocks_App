@@ -1,20 +1,26 @@
 package com.example.stock;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class adapter_home_port extends RecyclerView.Adapter<adapter_home_port.MyViewHolder> {
+public class adapter_home_port extends RecyclerView.Adapter<adapter_home_port.MyViewHolder> implements swipeAndDeleteAdapterHelper {
     Context context;
     ArrayList<portfoliomodel> portfoliomodels;
+    private static ItemTouchHelper touchelper;
 
     public adapter_home_port(Context context, ArrayList<portfoliomodel> portfoliomodels) {
         this.context = context;
@@ -35,6 +41,14 @@ public class adapter_home_port extends RecyclerView.Adapter<adapter_home_port.My
         holder.tv2.setText(portfoliomodels.get(position).getQty_owned());
         holder.tv3.setText(portfoliomodels.get(position).getMarket_value());
         holder.tv4.setText(portfoliomodels.get(position).getResult());
+        if(portfoliomodels.get(position).getRed() == 1) {
+            holder.tv4.setTextColor(Color.RED);
+        } else if (portfoliomodels.get(position).getRed() == 2) {
+            holder.tv4.setTextColor(Color.GREEN);
+        }
+        else{
+            holder.tv4.setTextColor(Color.BLACK);
+        }
         holder.iv_trending.setImageResource(portfoliomodels.get(position).getImage());
     }
 
@@ -43,10 +57,29 @@ public class adapter_home_port extends RecyclerView.Adapter<adapter_home_port.My
         return portfoliomodels.size()  ;
     }
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public void onItemMove(int from, int to) {
+        portfoliomodel temp = portfoliomodels.get(from);
+        portfoliomodels.remove(from);
+        portfoliomodels.add(to, temp);
+        notifyItemMoved(from, to);
+    }
+
+    @Override
+    public void onItemSwiped(int position) {
+        portfoliomodels.remove(position);
+        notifyItemRemoved(position);
+    }
+    public void setTouchHelper(ItemTouchHelper sdHelper){
+        this.touchelper = sdHelper;
+    }
+
+    public static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener, GestureDetector.OnGestureListener {
 
         ImageView iv_trending;
         TextView tv1, tv2, tv3, tv4;
+        GestureDetector mGestureDetector;
+
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -56,6 +89,44 @@ public class adapter_home_port extends RecyclerView.Adapter<adapter_home_port.My
             tv3 = itemView.findViewById(R.id.tv_var2_port);
             tv4 = itemView.findViewById(R.id.tv_var3_port);
 
+            mGestureDetector = new GestureDetector(itemView.getContext(), this);
+            itemView.setOnTouchListener(this);
+        }
+
+        @Override
+        public boolean onDown(@NonNull MotionEvent e) {
+            return false;
+        }
+
+        @Override
+        public void onShowPress(@NonNull MotionEvent e) {
+
+        }
+
+        @Override
+        public boolean onSingleTapUp(@NonNull MotionEvent e) {
+            return true;// TODO: back to false if error comes
+        }
+
+        @Override
+        public boolean onScroll(@Nullable MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
+            return false;
+        }
+
+        @Override
+        public void onLongPress(@NonNull MotionEvent e) {
+            touchelper.startDrag(this); //TODO: ERROR WARNING
+        }
+
+        @Override
+        public boolean onFling(@Nullable MotionEvent e1, @NonNull MotionEvent e2, float velocityX, float velocityY) {
+            return true; // TODO: back to false if error comes
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            mGestureDetector.onTouchEvent(event);
+            return true;
         }
     }
 }
