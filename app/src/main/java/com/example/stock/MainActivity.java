@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
                         }
                     }
                 };
-                handler.postDelayed(runnable, 800); // Delay the execution by 300 milliseconds
+                handler.postDelayed(runnable, 300); // Delay the execution by 300 milliseconds  TOSO: BBOONEC LOWEER MAKES I BETER HACK
                 return true;
 //                if (!newText.isEmpty()) {
 //                    fetchSearchSuggestions(newText, searchView);
@@ -208,30 +208,37 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
     }
     private void fetchSearchSuggestions(String text, SearchView searchView) {
         String suggestionUrl = "https://nodeserverass3.wl.r.appspot.com/search?q=" + Uri.encode(text);
-        MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1 });
-        searchView.setSuggestionsAdapter(new ExampleCursorAdapter(this, cursor));
+        MatrixCursor cursor = new MatrixCursor(new String[]{BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1});
 
+        // Initialize the adapter with the context and cursor
+        ExampleCursorAdapter adapter = new ExampleCursorAdapter(this, cursor);
+        searchView.setSuggestionsAdapter(adapter);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, suggestionUrl, null,
                 response -> {
                     Log.d("Suggestions", response.toString());
                     try {
+                        MatrixCursor newCursor = new MatrixCursor(new String[]{BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1});
                         for (int i = 0; i < response.length(); i++) {
                             String suggestion = response.getString(i);
-                            cursor.addRow(new Object[]{i, suggestion});
+                            newCursor.addRow(new Object[]{i, suggestion});
                         }
+                        // Update the adapter's cursor directly here
+                        adapter.changeCursor(newCursor);
+                        adapter.notifyDataSetChanged();  // Notify the adapter of the data change
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        Log.e("JSON Error", "Error parsing JSON for suggestions", e);
                     }
-
-                    searchView.setSuggestionsAdapter(new ExampleCursorAdapter(this, cursor));
-//                    updateSuggestions(response, searchView);
                 },
-                error -> Log.e("Error", error.toString())
+                error -> Log.e("Error", "Network error on fetching suggestions")
         );
 
-        // Assuming you have a RequestQueue initialized somewhere in your activity
-        requestQueue.add(jsonArrayRequest);
+        // Add the request to your RequestQueue
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(jsonArrayRequest);
     }
+
+
+    // Assuming you have a RequestQueue initialized somewhere in your activity
 //    private void updateSuggestions(JSONArray suggestions, SearchView searchView) {
 //        MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1 });
 //        try {
