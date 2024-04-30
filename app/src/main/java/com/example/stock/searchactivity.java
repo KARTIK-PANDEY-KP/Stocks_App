@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -20,5 +21,14 @@ public class searchactivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // TICKER value initialize from the Intent
+        String ticker = getIntent().getStringExtra("query");
+
+        // TOOLBAR
+        Toolbar mActionBarToolbar = findViewById(R.id.toolbar_page2);
+        mActionBarToolbar.setTitle(ticker);
+        setSupportActionBar(mActionBarToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 }

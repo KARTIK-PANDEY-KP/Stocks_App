@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
     private ProgressBar progressBar; // Declare the ProgressBar.
     ArrayList<portfoliomodel> portfoliomodels = new ArrayList<>();
     ArrayList<favouritesmodel> favouritesmodels = new ArrayList<>();
+    static int count = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        final String PREFS_NAME = "MyPrefsFile";
+
+
         TextView linkTextView = findViewById(R.id.finnhublink);
         linkTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
         });
 
 
-        Toolbar mActionBarToolbar = findViewById(R.id.toolbar2);
+        Toolbar mActionBarToolbar = findViewById(R.id.toolbar_page2);
         mActionBarToolbar.setTitle("Stocks");
         setSupportActionBar(mActionBarToolbar); // Correct usage
         Toolbar mActionBarToolbar_spinner = findViewById(R.id.toolbar);
@@ -90,8 +95,17 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
         String date_n = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(new Date());
         TextView date  = findViewById(R.id.curdate);
         date.setText(date_n);
-
-        setVisibilityForAllViews(View.GONE);
+        if(count == 0)
+        {
+            setVisibilityForAllViews(View.GONE);
+            count+=1;
+        }
+        else{
+            findViewById(R.id.toolbar).setVisibility(View.GONE);
+            findViewById(R.id.divider3).setVisibility(View.GONE);
+            findViewById(R.id.imageView).setVisibility(View.GONE);
+            findViewById(R.id.progressBar).setVisibility(View.GONE);
+        }
 
         fetchPortfolioData(adapter, adapter2);
 //        value.setValue(2);
@@ -289,6 +303,10 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
 
     private void updateUI_fav(JSONArray response, adapter_home adapter) {
         String get_quote_url = "https://nodeserverass3.wl.r.appspot.com/quote/?text=";
+        if (response != null && response.length() == 0) {
+            setValue(getValue() + 1);
+            Log.d("CHECH_FAV", "response empty fro watchlist/favourites : ");
+        } else {
         for (int i = 0; i < response.length(); i++) {
             String ticker = response.optJSONObject(i).optString("stock_ticker");
             String company_name = response.optJSONObject(i).optString("stock_company_name");
@@ -326,11 +344,13 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
                 Log.e("Error", error.toString());
 
                 showErrorMessage(error);
+
             });
 
             jsonObjectRequest.setShouldCache(false);
             requestQueue.add(jsonObjectRequest);
-        }
+        }}
+
     }
 
     private void updateUI_port(JSONObject response, adapter_home_port adapter2) {
@@ -422,7 +442,7 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
         findViewById(R.id.finnhublink).setVisibility(visibility);
         findViewById(R.id.rvportfolio).setVisibility(visibility);
         findViewById(R.id.rvfavourite).setVisibility(visibility);
-        findViewById(R.id.toolbar2).setVisibility(visibility);
+        findViewById(R.id.toolbar_page2).setVisibility(visibility);
         int oppositeVisibility = (visibility == View.VISIBLE) ? View.GONE : View.VISIBLE;
         findViewById(R.id.toolbar).setVisibility(oppositeVisibility);
         findViewById(R.id.divider3).setVisibility(oppositeVisibility);
