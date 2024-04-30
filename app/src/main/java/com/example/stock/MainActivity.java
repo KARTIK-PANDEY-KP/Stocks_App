@@ -251,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
         queue.add(jsonArrayRequest);
     }
 
-
     // Assuming you have a RequestQueue initialized somewhere in your activity
 //    private void updateSuggestions(JSONArray suggestions, SearchView searchView) {
 //        MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1 });
