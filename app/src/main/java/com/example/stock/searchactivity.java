@@ -1,9 +1,13 @@
     package com.example.stock;
 
+    import android.content.Context;
     import android.os.Bundle;
     import android.util.Log;
+    import android.view.LayoutInflater;
     import android.view.Menu;
     import android.view.MenuItem;
+    import android.view.View;
+    import android.view.ViewGroup;
     import android.widget.Toast;
 
     import androidx.activity.EdgeToEdge;
@@ -37,17 +41,27 @@
         int star_status;
         JSONObject stock_data_general;
 
-
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             EdgeToEdge.enable(this);
             setContentView(R.layout.activity_searchactivity);
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            ViewGroup rootView = (ViewGroup) findViewById(R.id.mainContainer); // Make sure this is not null
+
+            // Correctly inflate the layout
+            View pagr2topView = inflater.inflate(R.layout.pagr2top, rootView, false);
+
+            // Now add the view to the rootView
+            rootView.addView(pagr2topView, 0);
+
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
                 Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
                 v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
                 return insets;
             });
+
+
 
             // TICKER value initialize from the Intent
             this.ticker = getIntent().getStringExtra("query");
@@ -57,7 +71,7 @@
             fetchPortfolioData();
 
 
-                // TOOLBAR
+            // TOOLBAR
             Toolbar mActionBarToolbar = findViewById(R.id.toolbar_page2);
             mActionBarToolbar.setTitle(ticker);
             setSupportActionBar(mActionBarToolbar);
@@ -142,10 +156,13 @@
 
                 star.setIcon(R.drawable.full_star);
                 Log.d("DEBUG", "USTAR: CAHNGES" + stock_data_general.toString());
+                Toast.makeText(this, ticker + " is added to favorites", Toast.LENGTH_SHORT).show();
 
                 addStock(ticker, stock_data_general.optString("name"));
             } else {
                 star.setIcon(R.drawable.star_border);
+                    Toast.makeText(this, ticker + " is remov from favorites", Toast.LENGTH_SHORT).show();
+
                 deleteStock(ticker);
             }
         }
