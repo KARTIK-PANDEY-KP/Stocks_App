@@ -55,12 +55,12 @@
                 android:id="@+id/trending_img"
                 android:layout_width="16dp"
                 android:layout_height="19dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/tv_var3_port"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_var2_port"
+                app:layout_constraintTop_toTopOf="@+id/tv_var3_port"
+                app:layout_constraintVertical_bias="0.0"
                 tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
             <TextView
@@ -69,9 +69,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="TextView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/tv_var2_port"
+                app:layout_constraintEnd_toEndOf="@+id/tv_var2_port"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_var2_port" />
 
             <TextView
@@ -83,9 +83,21 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.899"
+                app:layout_constraintHorizontal_bias="0.914"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.764"
+                app:layout_constraintStart_toEndOf="@+id/tv_var2_port"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.488"
+                app:srcCompat="@drawable/right_arrow" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

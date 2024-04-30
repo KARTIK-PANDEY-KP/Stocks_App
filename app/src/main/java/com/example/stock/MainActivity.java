@@ -1,7 +1,6 @@
 package com.example.stock;
 
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -44,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements adapterinterface {
     private Handler handler = new Handler();
     private Runnable runnable;
     private int value = -1;
@@ -62,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         // Initialize the RequestQueue
         requestQueue = Volley.newRequestQueue(this);
         adapter_home adapter = new adapter_home(this,favouritesmodels);
-        adapter_home_port adapter2 = new adapter_home_port(this,portfoliomodels);
+        adapter_home_port adapter2 = new adapter_home_port(this,portfoliomodels, this);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -127,11 +126,11 @@ public class MainActivity extends AppCompatActivity {
         MenuItem searchItem = menu.findItem(R.id.action_search);
 
 //        SearchView searchView = (SearchView) searchItem.getActionView();
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) searchItem.getActionView();
 
 // Assumes current activity is the searchable activity
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         setupSearchView(searchView);
 
 
@@ -164,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 };
-                handler.postDelayed(runnable, 0); // Delay the execution by 300 milliseconds
+                handler.postDelayed(runnable, 800); // Delay the execution by 300 milliseconds
                 return true;
 //                if (!newText.isEmpty()) {
 //                    fetchSearchSuggestions(newText, searchView);
@@ -192,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Clear focus and close the search view
                 searchView.clearFocus();
+                searchView.setQuery(suggestion.split("\\|")[0].trim(), false);
                 return true;
             }
         });
@@ -403,26 +403,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "Network error: " + error.getMessage(), Toast.LENGTH_LONG).show();
     }
 
-    //FOR HANDLING THE PROGRESS BAR
-//    public void disableAllExceptToolbar() {
-//        ViewGroup mainLayout = findViewById(R.id.main);
-//        for (int i = 0; i < mainLayout.getChildCount(); i++) {
-//            View child = mainLayout.getChildAt(i);
-//            if (child.getId() != R.id.toolbar2) { // Skip the toolbar
-//                child.setEnabled(false);
-//            }
-//        }
-//    }
-//
-//    public void enableAllExceptToolbar() {
-//        ViewGroup mainLayout = findViewById(R.id.main);
-//        for (int i = 0; i < mainLayout.getChildCount(); i++) {
-//            View child = mainLayout.getChildAt(i);
-//            if (child.getId() != R.id.toolbar2) { // Skip the toolbar
-//                child.setEnabled(true);
-//            }
-//        }
-//    }
     private void setVisibilityForAllViews(int visibility) {
         findViewById(R.id.divider).setVisibility(visibility);
         findViewById(R.id.curdate).setVisibility(visibility);
@@ -437,7 +417,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.rvfavourite).setVisibility(visibility);
         findViewById(R.id.toolbar2).setVisibility(visibility);
         int oppositeVisibility = (visibility == View.VISIBLE) ? View.GONE : View.VISIBLE;
-        findViewById(R.id.toolbar2).setVisibility(oppositeVisibility);
+        findViewById(R.id.toolbar).setVisibility(oppositeVisibility);
         findViewById(R.id.divider3).setVisibility(oppositeVisibility);
 
         final View imageview = findViewById(R.id.imageView);
@@ -457,10 +437,22 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     // Set visibility of divider after 200ms delay
                     imageview.setVisibility(visibility);
-                    progressbar.setVisibility(oppositeVisibility);
+                    if(getValue() != 2) {
+                        progressbar.setVisibility(oppositeVisibility);
+                    }
                 }
             },  800); // Delay in milliseconds
         }
+    }
+
+    @Override
+    public void itemclickclick(int position) {
+        Intent callsearchactivity = new Intent(MainActivity.this, searchactivity.class);
+        callsearchactivity.putExtra("query", portfoliomodels.get(position).getTicker());
+        Log.d("SUBMIT_PORT",  portfoliomodels.get(position).getTicker());
+
+        startActivity(callsearchactivity);
+//        searchView.clearFocus(); // Add this line
     }
 }
 

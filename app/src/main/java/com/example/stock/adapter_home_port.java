@@ -2,6 +2,7 @@ package com.example.stock;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -18,13 +19,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class adapter_home_port extends RecyclerView.Adapter<adapter_home_port.MyViewHolder> implements swipeAndDeleteAdapterHelper {
+    private final adapterinterface adapterinterface;
+
     Context context;
     ArrayList<portfoliomodel> portfoliomodels;
     private static ItemTouchHelper touchelper;
 
-    public adapter_home_port(Context context, ArrayList<portfoliomodel> portfoliomodels) {
+    public adapter_home_port(Context context, ArrayList<portfoliomodel> portfoliomodels, adapterinterface adapterinterface) {
         this.context = context;
         this.portfoliomodels = portfoliomodels;
+        this.adapterinterface = adapterinterface;
     }
 
     @NonNull
@@ -32,7 +36,7 @@ public class adapter_home_port extends RecyclerView.Adapter<adapter_home_port.My
     public adapter_home_port.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.rvport_row, parent, false);
-        return new adapter_home_port.MyViewHolder(view);
+        return new adapter_home_port.MyViewHolder(view, adapterinterface);
     }
 
     @Override
@@ -75,12 +79,11 @@ public class adapter_home_port extends RecyclerView.Adapter<adapter_home_port.My
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener, GestureDetector.OnGestureListener {
-
         ImageView iv_trending;
         TextView tv1, tv2, tv3, tv4;
         GestureDetector mGestureDetector;
 
-        public MyViewHolder(@NonNull View itemView) {
+        public MyViewHolder(@NonNull View itemView, adapterinterface adapterinterface) {
             super(itemView);
 
             iv_trending = itemView.findViewById(R.id.trending_img);
@@ -90,7 +93,21 @@ public class adapter_home_port extends RecyclerView.Adapter<adapter_home_port.My
             tv4 = itemView.findViewById(R.id.tv_var3_port);
 
             mGestureDetector = new GestureDetector(itemView.getContext(), this);
+
             itemView.setOnTouchListener(this);
+            itemView.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    if(adapterinterface != null){
+                        int pos = getBindingAdapterPosition();
+                        if(pos != RecyclerView.NO_POSITION){
+                            adapterinterface.itemclickclick(pos);
+                        }
+                    }
+
+                }
+            });
+
         }
 
         @Override
@@ -125,8 +142,9 @@ public class adapter_home_port extends RecyclerView.Adapter<adapter_home_port.My
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            Log.d("TEST", "onTouch: " + event);
             mGestureDetector.onTouchEvent(event);
-            return true;
+            return false;
         }
     }
 }
