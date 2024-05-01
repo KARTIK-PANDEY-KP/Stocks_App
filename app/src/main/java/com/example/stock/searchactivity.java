@@ -88,6 +88,7 @@
 
 
 
+
             // TOOLBAR
             Toolbar mActionBarToolbar = findViewById(R.id.toolbar_page2);
             mActionBarToolbar.setTitle(ticker);
