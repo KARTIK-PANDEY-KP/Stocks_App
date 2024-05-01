@@ -34,9 +34,12 @@
     import com.google.android.material.tabs.TabLayout;
     import com.google.android.material.tabs.TabLayoutMediator;
 
+    import org.json.JSONArray;
+    import org.json.JSONException;
     import org.json.JSONObject;
 
     import java.io.IOException;
+    import java.text.NumberFormat;
     import java.util.Locale;
     import java.util.Objects;
     import java.util.concurrent.atomic.AtomicInteger;
@@ -50,7 +53,9 @@
     public class searchactivity extends AppCompatActivity {
         private RequestQueue requestQueue;  // Declare the RequestQueue.
         private String ticker;
+        private int value = -1;
         int star_status;
+        private int stock_qty;
         JSONObject stock_data_general, stock_data_quote, stock_data_portfolio;
         Button tradeButton;
 
@@ -103,15 +108,107 @@
                 }
             });
 
-
-
             // TOOLBAR
             Toolbar mActionBarToolbar = findViewById(R.id.toolbar_page2);
             mActionBarToolbar.setTitle(ticker);
             setSupportActionBar(mActionBarToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-            public void showCustomDialog() {
+        public void setValue(int newValue) {
+            if (newValue != this.value) {
+                this.value = newValue;
+                Log.d("DEBUG", "setvalue : " + newValue);
+
+                onValueChanged(newValue);
+            }
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        private void onValueChanged(int newValue) {
+            // Code to execute when the value changes
+            System.out.println("Value changed to: " + newValue);
+            Log.d("DEBUG", "onValueChanged: " + newValue);
+            if(newValue == 1) {
+                setPortfolio();
+            }
+            else if(newValue == -1) {
+                fetchStockData();
+            }
+//            else {
+//            }
+            // You can add more logic here as needed
+        }
+        public void setPortfolio(){
+            Log.d("portfolio_called", "setPortfolio: ");
+            updateStockInfo();
+        }
+        public void updateStockInfo() {
+            try {
+                JSONArray stocks = stock_data_portfolio.getJSONArray("stocks");
+                boolean notFound = true;
+                for (int i = 0; i < stocks.length(); i++) {
+                    JSONObject stock = stocks.getJSONObject(i);
+                    if (stock.getString("stock_ticker").equals(ticker)) {
+                        updateTextViews(stock);
+                        notFound = false;
+                        break;
+                    }
+                }
+                if(notFound){
+                    updateTextViews(null);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                // Handle JSON parsing error
+            }
+        }
+
+        private void updateTextViews(JSONObject stock) throws JSONException {
+            TextView textView10 = findViewById(R.id.textView10);
+            TextView textView11 = findViewById(R.id.textView11);
+            TextView textView12 = findViewById(R.id.textView12);
+            TextView textView13 = findViewById(R.id.textView13);
+            TextView textView14 = findViewById(R.id.textView14);
+            int quantityOwned = 0;
+            double avgPricePerShare = 0;
+            double currentPrice = 0;
+            double marketValue = 0;
+            double priceChange = 0;
+            if(stock != null)
+            {
+                quantityOwned = stock.getInt("quantity_owned");
+                avgPricePerShare = stock.getDouble("stock_avg_price_per_share");
+                currentPrice = stock_data_quote.getDouble("c");
+                marketValue = quantityOwned * currentPrice;
+                priceChange = (currentPrice - avgPricePerShare)*quantityOwned;
+            }
+            stock_qty = quantityOwned;
+
+            // Using resource strings with placeholders
+            textView10.setText(getString(R.string.stock_details, quantityOwned));
+            textView11.setText(getString(R.string.price_format, avgPricePerShare));
+            textView12.setText(getString(R.string.price_format, avgPricePerShare*quantityOwned));
+            textView13.setText(getString(R.string.price_format, priceChange));
+            textView14.setText(getString(R.string.price_format, marketValue));
+
+            // Update colors based on the stock price change
+            if (priceChange > 0) {
+                textView13.setTextColor(Color.GREEN);
+                textView14.setTextColor(Color.GREEN);
+            } else if (priceChange < 0) {
+                textView13.setTextColor(Color.RED);
+                textView14.setTextColor(Color.RED);
+            } else {
+                textView13.setTextColor(Color.BLACK);
+                textView14.setTextColor(Color.BLACK);
+            }
+        }
+
+
+        public void showCustomDialog() {
                 final Dialog dialog = new Dialog(searchactivity.this);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCancelable(true);
@@ -214,9 +311,9 @@
                         double totalCost = stockPrice * shares;
 
                         if (totalCost > finalMoneyValue) {
-                            Toast.makeText(searchactivity.this, "Not enough cash balance to buy.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(searchactivity.this, "Not enough cash balance to buy", Toast.LENGTH_SHORT).show();
                         } else if (shares == 0) {
-                            Toast.makeText(searchactivity.this, "Please enter a valid amount.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(searchactivity.this, "Please enter a valid amount", Toast.LENGTH_SHORT).show();
                         } else {
                             // Proceed with opening the congratulations dialog
                             final Dialog dialog2 = new Dialog(searchactivity.this);
@@ -231,7 +328,7 @@
                                     dialog2.dismiss();
                                 }
                             });
-                            buy_stock();
+                            buyStock(String.valueOf(shares), dialog2);
                             dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                             dialog2.show();
                             dialog.dismiss();
@@ -243,29 +340,168 @@
                     @Override
                     public void onClick(View v) {
                         Log.d("DEBUG", "Button 3 clicked");
+                        double shares = Double.parseDouble(editTextNumber.getText().toString());
+                        double stockPrice = stock_data_quote.optDouble("c");
+                        double totalCost = stockPrice * shares;
 
-                        final Dialog dialog2 = new Dialog(searchactivity.this);
-                        dialog2.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                        dialog2.setCancelable(true);
-                        dialog2.setContentView(R.layout.buycongrats);
+                        if (shares >= stock_qty || (stock_qty == 0 && shares != 0)){
+                            Toast.makeText(searchactivity.this, "Not enough shares to sell", Toast.LENGTH_SHORT).show();
+                        } else if (shares == 0) {
+                            Toast.makeText(searchactivity.this, "Please enter a valid amount", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Proceed with opening the congratulations dialog
+                            final Dialog dialog2 = new Dialog(searchactivity.this);
+                            dialog2.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                            dialog2.setCancelable(true);
+                            dialog2.setContentView(R.layout.buycongrats);
 
-                        Button button5 = dialog2.findViewById(R.id.button5);
-                        button5.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog2.dismiss();
-                            }
-                        });
-
-                        dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                        dialog2.show();
-                        dialog.dismiss();
+                            Button button5 = dialog2.findViewById(R.id.button5);
+                            button5.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog2.dismiss();
+                                }
+                            });
+                            sellStock(String.valueOf(shares), dialog2);
+                            Log.d("DEBUG", "onClick: setvalue-1 sell");
+                            dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                            dialog2.show();
+                            dialog.dismiss();
+                        }
                     }
                 });
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.show();
-            }
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
 
+        }
+        public void sellStock(String qty, Dialog dialog2) {
+            // Extract stock details
+            String ticker = this.ticker; // Assuming 'this.ticker' is set elsewhere in the class
+            double currentStockPrice;
+            String endpoint = "https://nodeserverass3.wl.r.appspot.com/sell";
+            Log.d("DEBUG", "sellStock: ");
+            TextView textView23 = dialog2.findViewById(R.id.textView23);
+            TextView textView24 = dialog2.findViewById(R.id.textView24);
+            double qtyDouble = Double.parseDouble(qty);
+            NumberFormat nf = NumberFormat.getNumberInstance(Locale.US); // You can choose locale as needed
+            nf.setMaximumFractionDigits(2); // Maximum 2 digits after the decimal point
+            nf.setMinimumFractionDigits(0); // Could be zero if we don't need decimal point
+            qty = nf.format(qtyDouble);
+            String message3 = "You have successfully sold " + qty;
+            textView23.setText(message3);
+            String message4 = "shares of " + ticker;
+            textView24.setText(message4);
+
+
+            try {
+                currentStockPrice = stock_data_quote.optDouble("c");
+                Log.d("DEBUG", "buyStock: + " + currentStockPrice);
+                // Now create the JSON body to send to the server
+                JSONObject requestBody = new JSONObject();
+                requestBody.put("ticker", ticker);
+                requestBody.put("qty", Double.parseDouble(qty));
+                requestBody.put("currentStockPrice", currentStockPrice);
+                Log.d("DEBUG ", "buyStock: " + requestBody);
+                // Send this data to the server
+                postRequest(endpoint, requestBody);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                // Handle JSON parsing or number format errors
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                // Handle errors in converting qty to an integer
+            }
+        }
+
+        public void buyStock(String qty, Dialog dialog2) {
+            // Extract stock details
+            String ticker = this.ticker; // Assuming 'this.ticker' is set elsewhere in the class
+            double currentStockPrice;
+            String companyName;
+            String endpoint = "https://nodeserverass3.wl.r.appspot.com/buy";
+            Log.d("DEBUG", "buyStock: ");
+            TextView textView23 = dialog2.findViewById(R.id.textView23);
+            TextView textView24 = dialog2.findViewById(R.id.textView24);
+            double qtyDouble = Double.parseDouble(qty);
+            NumberFormat nf = NumberFormat.getNumberInstance(Locale.US); // You can choose locale as needed
+            nf.setMaximumFractionDigits(2); // Maximum 2 digits after the decimal point
+            nf.setMinimumFractionDigits(0); // Could be zero if we don't need decimal point
+            qty = nf.format(qtyDouble);
+            String message3 = "You have successfully bought " + qty;
+            textView23.setText(message3);
+            String message4 = "shares of " + ticker;
+            textView24.setText(message4);
+
+
+            try {
+                currentStockPrice = stock_data_quote.optDouble("c");
+                companyName = stock_data_general.optString("name");
+                Log.d("DEBUG", "buyStock: + " + currentStockPrice + companyName);
+                // Now create the JSON body to send to the server
+                JSONObject requestBody = new JSONObject();
+                requestBody.put("ticker", ticker);
+                requestBody.put("companyName", companyName);
+                requestBody.put("qty", Double.parseDouble(qty));
+                requestBody.put("currentStockPrice", currentStockPrice);
+                Log.d("DEBUG ", "buyStock: " + requestBody);
+                // Send this data to the server
+                postRequest(endpoint, requestBody);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                // Handle JSON parsing or number format errors
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                // Handle errors in converting qty to an integer
+            }
+        }
+
+        // Method to send POST request to the server
+        private void postRequest(String url, JSONObject jsonBody) {
+            // Create OkHttpClient instance
+            OkHttpClient client = new OkHttpClient();
+
+            // Define the MediaType for JSON
+            MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
+
+            // Create RequestBody
+            RequestBody body = RequestBody.create(jsonBody.toString(), MEDIA_TYPE_JSON);
+
+            // Create a Request
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(body)
+                    .build();
+
+            // Asynchronous Call to the server
+            client.newCall(request).enqueue(new okhttp3.Callback() {
+                @Override
+                public void onFailure(okhttp3.Call call, IOException e) {
+                    // Handle the error
+                    e.printStackTrace();
+                }
+
+                @Override
+                public void onResponse(okhttp3.Call call, Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        // Handle the response
+                        String responseData = response.body().string();
+                        // Since the response handling often updates UI, ensure you switch back to the main thread if necessary
+                        runOnUiThread(() -> {
+                            // Update UI or show a success message
+                        });
+                        setValue(-1);
+
+                    } else {
+                        // Handle the failure case
+                        runOnUiThread(() -> {
+                            // Show error message to the user
+                        });
+                    }
+                }
+            });
+        }
         public boolean onCreateOptionsMenu(Menu menu) {
             getMenuInflater().inflate(R.menu.menu_stock_page, menu);
             MenuItem star = menu.findItem(R.id.star);
@@ -300,6 +536,7 @@
                                 response2 -> {
                                     Log.d("Response", response2.toString());
                                     stock_data_quote = response2;
+                                    setValue(getValue() + 1);
                                     update_part1(stock_data_quote);
                                 }, error -> {
                             Log.e("Error", error.toString());
@@ -318,6 +555,7 @@
                     response2 -> {
                         Log.d("Response", response2.toString());
                         stock_data_portfolio =  response2;
+                        setValue(getValue() + 1);
                     }, error -> {
                 Log.e("Error", error.toString());
                 showErrorMessage(error);
