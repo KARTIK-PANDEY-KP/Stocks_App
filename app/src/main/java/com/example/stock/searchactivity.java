@@ -1,10 +1,16 @@
     package com.example.stock;
 
+    import android.app.Dialog;
     import android.graphics.Color;
+    import android.graphics.drawable.ColorDrawable;
     import android.os.Bundle;
     import android.util.Log;
     import android.view.Menu;
     import android.view.MenuItem;
+    import android.view.View;
+    import android.view.Window;
+    import android.widget.Button;
+    import android.widget.EditText;
     import android.widget.ImageView;
     import android.widget.TextView;
     import android.widget.Toast;
@@ -44,6 +50,7 @@
         private String ticker;
         int star_status;
         JSONObject stock_data_general, stock_data_quote;
+        Button tradeButton;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +92,13 @@
             //FETCHES AND DISPLAYS GENERAL DATA LIKE NAME ETC - PART 1
             fetchStockData();
             // PART 1 DONE
-
+            tradeButton = findViewById(R.id.tradeButton);
+            tradeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showCustomDialog();
+                }
+            });
 
 
 
@@ -94,6 +107,26 @@
             mActionBarToolbar.setTitle(ticker);
             setSupportActionBar(mActionBarToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        public void showCustomDialog(){
+            final Dialog dialog = new Dialog(searchactivity.this);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setCancelable(true);
+            dialog.setContentView(R.layout.button_layout);
+            // Initialize Buttons
+            Button button = findViewById(R.id.button);
+            Button button3 = findViewById(R.id.button3);
+
+            // Initialize EditText
+            EditText editTextNumber = findViewById(R.id.editTextNumber);
+
+            // Initialize TextViews
+            TextView textView15 = findViewById(R.id.textView15);
+            TextView textView16 = findViewById(R.id.textView16);
+            TextView textView17 = findViewById(R.id.textView17);
+            TextView textView18 = findViewById(R.id.textView18);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
         }
         public boolean onCreateOptionsMenu(Menu menu) {
             getMenuInflater().inflate(R.menu.menu_stock_page, menu);
