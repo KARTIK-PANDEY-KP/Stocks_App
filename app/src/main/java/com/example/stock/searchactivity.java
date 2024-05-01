@@ -126,7 +126,31 @@
 
                 // Initialize TextViews from the dialog
                 TextView textView15 = dialog.findViewById(R.id.textView15);
+                String moneyInWallet = stock_data_portfolio.optString("moneyInWallet");
+                String ticker = this.ticker;  // Make sure this variable is accessible in the current scope
+
+                // Convert the String to a double and format it
+                double moneyValue = 0.0;
+                try {
+                    moneyValue = Double.parseDouble(moneyInWallet);  // This converts the String to a double
+                } catch (NumberFormatException e) {
+                    // Handle the case where moneyInWallet is not a valid double
+                    // Optionally, you can set a default value or manage the error differently
+                }
+
+                // Formatting the message with two decimal places
+                String formattedMoney = String.format(Locale.US, "%.2f", moneyValue);
+                String message2 = "$" + formattedMoney + " to buy " + ticker;
+
+                // Setting the formatted message to the TextView
+                textView15.setText(message2);
                 TextView textView16 = dialog.findViewById(R.id.textView16);
+                // Retrieve the name of the stock and format the message
+                String stockName = stock_data_general.optString("name");
+                String message = "Trade " + stockName + " shares";
+
+                // Set the formatted message to the TextView
+                textView16.setText(message);
                 TextView textView17 = dialog.findViewById(R.id.textView17);
                 TextView textView18 = dialog.findViewById(R.id.textView18);
 
@@ -182,28 +206,36 @@
 
                 });
 
+                double finalMoneyValue = moneyValue;
                 button.setOnClickListener(new View.OnClickListener() {
-                    @Override
                     public void onClick(View v) {
-                        Log.d("DEBUG", "Button 1 clicked");
+                        double shares = Double.parseDouble(editTextNumber.getText().toString());
+                        double stockPrice = stock_data_quote.optDouble("c");
+                        double totalCost = stockPrice * shares;
 
-                        final Dialog dialog2 = new Dialog(searchactivity.this);
-                        dialog2.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                        dialog2.setCancelable(true);
-                        dialog2.setContentView(R.layout.buycongrats);
+                        if (totalCost > finalMoneyValue) {
+                            Toast.makeText(searchactivity.this, "Not enough cash balance to buy.", Toast.LENGTH_SHORT).show();
+                        } else if (shares == 0) {
+                            Toast.makeText(searchactivity.this, "Please enter a valid amount.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Proceed with opening the congratulations dialog
+                            final Dialog dialog2 = new Dialog(searchactivity.this);
+                            dialog2.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                            dialog2.setCancelable(true);
+                            dialog2.setContentView(R.layout.buycongrats);
 
-                        Button button5 = dialog2.findViewById(R.id.button5);
-                        button5.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog2.dismiss();
-                            }
-                        });
-
-                        dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                        dialog2.show();
-                        dialog.dismiss();
-
+                            Button button5 = dialog2.findViewById(R.id.button5);
+                            button5.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog2.dismiss();
+                                }
+                            });
+                            buy_stock();
+                            dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                            dialog2.show();
+                            dialog.dismiss();
+                        }
                     }
                 });
 
