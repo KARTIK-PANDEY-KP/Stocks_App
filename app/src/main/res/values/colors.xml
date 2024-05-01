@@ -4,6 +4,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="purple_500">#9C27B0</color>
     <color name="RED">#FF1100
+
     </color> <!-- This is an example purple color. Change the hex value to the purple shade you desire. -->
+    <color name="blue">#0000FF</color>
 
 </resources>

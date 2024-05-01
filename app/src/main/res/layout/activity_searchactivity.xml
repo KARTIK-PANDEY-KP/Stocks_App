@@ -55,12 +55,38 @@
             app:layout_constraintVertical_bias="0.6" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <WebView
-        android:layout_width="409dp"
-        android:layout_height="313dp"
-        android:layout_marginTop="1dp"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/sampleViewPage"
+        android:layout_width="407dp"
+        android:layout_height="419dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="4dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/sampleTabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@+id/sampleViewPage"
+        app:tabIndicatorColor="#673AB7"
+        app:tabIndicatorFullWidth="true">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monday" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tuesday"
+            tools:layout_editor_absoluteX="137dp"
+            tools:layout_editor_absoluteY="-6dp" />
+
+    </com.google.android.material.tabs.TabLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,17 +10,21 @@
     import android.widget.Toast;
 
     import androidx.activity.EdgeToEdge;
+    import androidx.annotation.NonNull;
     import androidx.appcompat.app.AppCompatActivity;
     import androidx.appcompat.widget.Toolbar;
     import androidx.core.graphics.Insets;
     import androidx.core.view.ViewCompat;
     import androidx.core.view.WindowInsetsCompat;
+    import androidx.viewpager2.widget.ViewPager2;
 
     import com.android.volley.RequestQueue;
     import com.android.volley.VolleyError;
     import com.android.volley.toolbox.JsonArrayRequest;
     import com.android.volley.toolbox.JsonObjectRequest;
     import com.android.volley.toolbox.Volley;
+    import com.google.android.material.tabs.TabLayout;
+    import com.google.android.material.tabs.TabLayoutMediator;
 
     import org.json.JSONObject;
 
@@ -47,6 +51,8 @@
             EdgeToEdge.enable(this);
             setContentView(R.layout.activity_searchactivity);
 
+
+
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
                 Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
                 v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -58,6 +64,23 @@
             // TICKER value initialize from the Intent
             this.ticker = getIntent().getStringExtra("query");
             requestQueue = Volley.newRequestQueue(this);
+            ViewPager2 sampleViewPager = findViewById(R.id.sampleViewPage);
+            sampleViewPager.setAdapter(new sampleAdpater(this, this.ticker));
+            TabLayout sampleTabLayout = findViewById(R.id.sampleTabLayout);
+            new TabLayoutMediator(
+                    sampleTabLayout,
+                    sampleViewPager,
+                    new TabLayoutMediator.TabConfigurationStrategy() {
+                        @Override
+                        public void onConfigureTab(@NonNull TabLayout.Tab tab, int i) {
+                            if(i == 0) {
+                                tab.setIcon(R.drawable.chart_hour);
+                            }
+                            else if(i == 1){
+                                tab.setIcon(R.drawable.chart_historical);
+                            }
+                        }
+                    }).attach();
 
             //FETCHES AND DISPLAYS GENERAL DATA LIKE NAME ETC - PART 1
             fetchStockData();
