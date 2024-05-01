@@ -20,41 +20,23 @@
     <script>
         (async () => {
             // Load the dataset
-            const data = await fetch(
-                'https://demo-live-data.highcharts.com/aapl-ohlcv.json'
-            ).then(response => response.json());
+            const response = await fetch(`https://nodeserverass3.wl.r.appspot.com/volumechart?text=AAPL`);
+            const data = await response.json();
+            const ohlc = [];
+            const volume = [];
 
             // split the data set into ohlc and volume
-            const ohlc = [],
-                volume = [],
-                dataLength = data.length,
-                // set the allowed units for data grouping
-                groupingUnits = [[
-                    'week',                         // unit name
-                    [1]                             // allowed multiples
-                ], [
-                    'month',
-                    [1, 2, 3, 4, 6]
-                ]];
+            const groupingUnits = [
+                ['week', [1]], ['month', [1, 2, 3, 4, 6]]
+            ];
 
-            for (let i = 0; i < dataLength; i += 1) {
-                ohlc.push([
-                    data[i][0], // the date
-                    data[i][1], // open
-                    data[i][2], // high
-                    data[i][3], // low
-                    data[i][4] // close
-                ]);
-
-                volume.push([
-                    data[i][0], // the date
-                    data[i][5] // the volume
-                ]);
-            }
+            data.forEach(item => {
+                ohlc.push([item[0], item[1], item[2], item[3], item[4]]);
+                volume.push([item[0], item[5]]);
+            });
 
             // create the chart
             Highcharts.stockChart('container', {
-
                 rangeSelector: {
                     selected: 2
                 },
@@ -69,7 +51,7 @@
 
                 yAxis: [{
                     startOnTick: false,
-                    endOnTick: false,
+            endOnTick: false,
                     labels: {
                         align: 'right',
                         x: -3
@@ -108,7 +90,7 @@
                     }
                 },
                 exporting: {
-                    enabled: true
+                    enable: false
                 },
 
                 series: [{
@@ -121,8 +103,8 @@
                     type: 'column',
                     name: 'Volume',
                     id: 'volume',
-                    data: volume,
-                    yAxis: 1
+                    yAxis: 1,
+                    data: volume
                 }, {
                     type: 'vbp',
                     linkedTo: 'aapl',
@@ -130,7 +112,7 @@
                         volumeSeriesID: 'volume'
                     },
                     dataLabels: {
-                        enabled: false
+                        enabled: false  // Disable data labels
                     },
                     zoneLines: {
                         enabled: false
