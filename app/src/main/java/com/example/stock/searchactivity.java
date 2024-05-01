@@ -1,13 +1,12 @@
     package com.example.stock;
 
-    import android.content.Context;
+    import android.graphics.Color;
     import android.os.Bundle;
     import android.util.Log;
-    import android.view.LayoutInflater;
     import android.view.Menu;
     import android.view.MenuItem;
-    import android.view.View;
-    import android.view.ViewGroup;
+    import android.widget.ImageView;
+    import android.widget.TextView;
     import android.widget.Toast;
 
     import androidx.activity.EdgeToEdge;
@@ -26,6 +25,7 @@
     import org.json.JSONObject;
 
     import java.io.IOException;
+    import java.util.Locale;
     import java.util.Objects;
     import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,21 +39,13 @@
         private RequestQueue requestQueue;  // Declare the RequestQueue.
         private String ticker;
         int star_status;
-        JSONObject stock_data_general;
+        JSONObject stock_data_general, stock_data_quote;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             EdgeToEdge.enable(this);
             setContentView(R.layout.activity_searchactivity);
-            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            ViewGroup rootView = (ViewGroup) findViewById(R.id.mainContainer); // Make sure this is not null
-
-            // Correctly inflate the layout
-            View pagr2topView = inflater.inflate(R.layout.pagr2top, rootView, false);
-
-            // Now add the view to the rootView
-            rootView.addView(pagr2topView, 0);
 
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
                 Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -67,8 +59,10 @@
             this.ticker = getIntent().getStringExtra("query");
             requestQueue = Volley.newRequestQueue(this);
 
-            //FETCHES GENERAL DATA LIKE NAME ETC
-            fetchPortfolioData();
+            //FETCHES AND DISPLAYS GENERAL DATA LIKE NAME ETC - PART 1
+            fetchStockData();
+            // PART 1 DONE
+
 
 
             // TOOLBAR
@@ -100,25 +94,69 @@
 
             return true;
         }
-        private void fetchPortfolioData() {
+        private void fetchStockData() {
             String url = "https://nodeserverass3.wl.r.appspot.com/submit?text=" + ticker;
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.GET, url, null,
                     response -> {
                         Log.d("Response", response.toString());
                         stock_data_general = response;
+                        String get_quote_url = "https://nodeserverass3.wl.r.appspot.com/quote/?text=" + ticker;
+                        JsonObjectRequest jsonObjectRequest_quote = new JsonObjectRequest(com.android.volley.Request.Method.GET, get_quote_url, null,
+                                response2 -> {
+                                    Log.d("Response", response2.toString());
+                                    stock_data_quote = response2;
+                                    update_part1(stock_data_quote);
+                                }, error -> {
+                            Log.e("Error", error.toString());
+                            showErrorMessage(error);
+                        });
+                        jsonObjectRequest_quote.setShouldCache(false);
+                        requestQueue.add(jsonObjectRequest_quote);
+
                     }, error -> {
                 Log.e("Error", error.toString());
                 showErrorMessage(error);
             });
 
-
-
             jsonObjectRequest.setShouldCache(false);
             requestQueue.add(jsonObjectRequest);
         }
+        private void update_part1(JSONObject stock_data_quote) {
+            ImageView iv_trending = this.findViewById(R.id.trending_img);
+            TextView tv1 = this.findViewById(R.id.ticker);
+            TextView tv2 = findViewById(R.id.tv_var1);
+            TextView tv3 = findViewById(R.id.tv_var2);
+            TextView tv4 = findViewById(R.id.tv_var3);
 
+            Log.d("DEBUG", "update_part1: 1" + stock_data_quote.optString("dp"));
+            tv1.setText(ticker);
+            tv2.setText(stock_data_general.optString("name"));
 
+            String curr_price = "$" + String.format(Locale.US, "%.2f", stock_data_quote.optDouble("c"));
+            tv3.setText(curr_price);
+            Log.d("DEBUG", "update_part1: 3");
 
+            double change = stock_data_quote.optDouble("d");
+            double percent_change = stock_data_quote.optDouble("dp");
+
+            // Safely parse the double values
+            double changeValue = change;
+            double percentChangeValue = percent_change;
+            String result = String.format(Locale.US, "$%.2f (%.2f%%)", changeValue, percentChangeValue);
+            tv4.setText(result);
+
+            if (percentChangeValue > 0.0) {
+                tv4.setTextColor(Color.GREEN);
+                iv_trending.setImageResource(R.drawable.trending_up);
+            } else if (percentChangeValue < 0.0) {
+                tv4.setTextColor(Color.RED);
+                iv_trending.setImageResource(R.drawable.trending_down);
+            } else {
+                tv4.setTextColor(Color.BLACK);
+                iv_trending.setImageResource(R.color.white);
+            }
+
+        }
         // STAR STATE FETCH METHODS
     //this api call is redundant
         private void fetchStarStatus(MenuItem star, FetchStatusCallback callback) {
@@ -149,20 +187,16 @@
             star_status = star_status == 1 ? 0: 1; // Toggle the state
             // Here, you might also want to send this status change to your server or database
         }
-
         private void updateStarIcon(MenuItem star) {
             if (star_status == 0) {
                 Log.d("DEBUG", "USTAR: ");
-
                 star.setIcon(R.drawable.full_star);
                 Log.d("DEBUG", "USTAR: CAHNGES" + stock_data_general.toString());
                 Toast.makeText(this, ticker + " is added to favorites", Toast.LENGTH_SHORT).show();
-
                 addStock(ticker, stock_data_general.optString("name"));
             } else {
                 star.setIcon(R.drawable.star_border);
-                    Toast.makeText(this, ticker + " is remov from favorites", Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(this, ticker + " is remov from favorites", Toast.LENGTH_SHORT).show();
                 deleteStock(ticker);
             }
         }

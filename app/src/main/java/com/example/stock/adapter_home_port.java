@@ -87,10 +87,10 @@ public class adapter_home_port extends RecyclerView.Adapter<adapter_home_port.My
             super(itemView);
 
             iv_trending = itemView.findViewById(R.id.trending_img);
-            tv1 = itemView.findViewById(R.id.ticker_port);
-            tv2 = itemView.findViewById(R.id.tv_var1_port);
-            tv3 = itemView.findViewById(R.id.tv_var2_port);
-            tv4 = itemView.findViewById(R.id.tv_var3_port);
+            tv1 = itemView.findViewById(R.id.ticker);
+            tv2 = itemView.findViewById(R.id.tv_var1);
+            tv3 = itemView.findViewById(R.id.tv_var2);
+            tv4 = itemView.findViewById(R.id.tv_var3);
 
             mGestureDetector = new GestureDetector(itemView.getContext(), this);
 
