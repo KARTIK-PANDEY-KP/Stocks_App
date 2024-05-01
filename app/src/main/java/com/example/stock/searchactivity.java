@@ -4,6 +4,8 @@
     import android.graphics.Color;
     import android.graphics.drawable.ColorDrawable;
     import android.os.Bundle;
+    import android.text.Editable;
+    import android.text.TextWatcher;
     import android.util.Log;
     import android.view.Menu;
     import android.view.MenuItem;
@@ -49,7 +51,7 @@
         private RequestQueue requestQueue;  // Declare the RequestQueue.
         private String ticker;
         int star_status;
-        JSONObject stock_data_general, stock_data_quote;
+        JSONObject stock_data_general, stock_data_quote, stock_data_portfolio;
         Button tradeButton;
 
         @Override
@@ -96,6 +98,7 @@
             tradeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.d("DEBUG", "onClick: 1");
                     showCustomDialog();
                 }
             });
@@ -108,26 +111,129 @@
             setSupportActionBar(mActionBarToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        public void showCustomDialog(){
-            final Dialog dialog = new Dialog(searchactivity.this);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.setCancelable(true);
-            dialog.setContentView(R.layout.button_layout);
-            // Initialize Buttons
-            Button button = findViewById(R.id.button);
-            Button button3 = findViewById(R.id.button3);
+            public void showCustomDialog() {
+                final Dialog dialog = new Dialog(searchactivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setCancelable(true);
+                dialog.setContentView(R.layout.button_layout);
 
-            // Initialize EditText
-            EditText editTextNumber = findViewById(R.id.editTextNumber);
+                // Initialize Buttons from the dialog
+                Button button = dialog.findViewById(R.id.button);
+                Button button3 = dialog.findViewById(R.id.button3);
 
-            // Initialize TextViews
-            TextView textView15 = findViewById(R.id.textView15);
-            TextView textView16 = findViewById(R.id.textView16);
-            TextView textView17 = findViewById(R.id.textView17);
-            TextView textView18 = findViewById(R.id.textView18);
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            dialog.show();
-        }
+                // Initialize EditText from the dialog
+                EditText editTextNumber = dialog.findViewById(R.id.editTextNumber);
+
+                // Initialize TextViews from the dialog
+                TextView textView15 = dialog.findViewById(R.id.textView15);
+                TextView textView16 = dialog.findViewById(R.id.textView16);
+                TextView textView17 = dialog.findViewById(R.id.textView17);
+                TextView textView18 = dialog.findViewById(R.id.textView18);
+
+                double stockPrice = stock_data_quote.optDouble("c");
+                double shares = Double.parseDouble(editTextNumber.getText().toString());
+                double result = stockPrice * shares;
+                String resultText = shares + "*" + "$" + String.format(Locale.US, "%.2f", stockPrice) + " / " + "share" + " = " + String.format(Locale.US, "%.2f", result);
+                textView18.setText(resultText);
+
+                editTextNumber.addTextChangedListener(new TextWatcher() {
+                    boolean isReplacing = false;
+
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                        // Not used here, but you can implement logic if needed before text changes
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        // Not used here, but you can implement logic if needed during text changes
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (isReplacing) return;
+
+                        if (s.toString().equals("")) {
+                            isReplacing = true;
+                            s.append("0");
+                            isReplacing = false;
+                        } else if (s.toString().startsWith("0") && s.length() > 1) {
+                            isReplacing = true;
+                            String textWithoutZero = s.toString().substring(1);
+                            s.replace(0, s.length(), textWithoutZero);
+                            editTextNumber.setSelection(s.length()); // Move the cursor to the end of the text
+                            isReplacing = false;
+                        }
+
+                        updateTextView(s.toString());
+                    }
+
+                    private void updateTextView(String input) {
+                        try {
+                            double stockPrice = stock_data_quote.optDouble("c");
+                            double shares = Double.parseDouble(input);
+                            double result = stockPrice * shares;
+                            String resultText = shares + "*" + "$" + String.format(Locale.US, "%.2f", stockPrice) + " / " + "share" + " = " + String.format(Locale.US, "%.2f", result);
+                            textView18.setText(resultText);
+                        } catch (NumberFormatException e) {
+                            textView18.setText("Invalid number of shares");
+                        }
+                    }
+
+                });
+
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("DEBUG", "Button 1 clicked");
+
+                        final Dialog dialog2 = new Dialog(searchactivity.this);
+                        dialog2.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog2.setCancelable(true);
+                        dialog2.setContentView(R.layout.buycongrats);
+
+                        Button button5 = dialog2.findViewById(R.id.button5);
+                        button5.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog2.dismiss();
+                            }
+                        });
+
+                        dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialog2.show();
+                        dialog.dismiss();
+
+                    }
+                });
+
+                button3.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("DEBUG", "Button 3 clicked");
+
+                        final Dialog dialog2 = new Dialog(searchactivity.this);
+                        dialog2.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog2.setCancelable(true);
+                        dialog2.setContentView(R.layout.buycongrats);
+
+                        Button button5 = dialog2.findViewById(R.id.button5);
+                        button5.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog2.dismiss();
+                            }
+                        });
+
+                        dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialog2.show();
+                        dialog.dismiss();
+                    }
+                });
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+            }
+
         public boolean onCreateOptionsMenu(Menu menu) {
             getMenuInflater().inflate(R.menu.menu_stock_page, menu);
             MenuItem star = menu.findItem(R.id.star);
@@ -174,7 +280,18 @@
                 Log.e("Error", error.toString());
                 showErrorMessage(error);
             });
+            String url_port = "https://nodeserverass3.wl.r.appspot.com/fetch_big";
 
+            JsonObjectRequest jsonObjectRequest2 = new JsonObjectRequest(com.android.volley.Request.Method.GET, url_port, null,
+                    response2 -> {
+                        Log.d("Response", response2.toString());
+                        stock_data_portfolio =  response2;
+                    }, error -> {
+                Log.e("Error", error.toString());
+                showErrorMessage(error);
+            });
+            jsonObjectRequest2.setShouldCache(false);
+            requestQueue.add(jsonObjectRequest2);
             jsonObjectRequest.setShouldCache(false);
             requestQueue.add(jsonObjectRequest);
         }
@@ -237,7 +354,7 @@
                 showErrorMessage(error);
             });
 
-            jsonArrayRequest_fav.setShouldCache(false);
+            jsonArrayRequest_fav.setShouldCache(false);jsonArrayRequest_fav.setShouldCache(false);
             requestQueue.add(jsonArrayRequest_fav);
         }
         private void toggleStarStatus() {

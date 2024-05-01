@@ -90,6 +90,7 @@
                 android:layout_marginTop="16dp"
                 android:ems="10"
                 android:inputType="number"
+                android:text="0"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.242"
                 app:layout_constraintStart_toStartOf="parent"

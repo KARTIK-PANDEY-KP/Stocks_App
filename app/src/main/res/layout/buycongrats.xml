@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:backgroundTint="#FFFFFF">
+    android:background="@android:color/transparent"
+
+    >
 
     <androidx.cardview.widget.CardView
         android:layout_width="368dp"
@@ -13,11 +14,12 @@
         android:backgroundTint="#4CAF50"
         app:cardCornerRadius="100px"
         tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="167dp">
+        tools:layout_editor_absoluteY="8dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="370dp"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent">
 
             <TextView
                 android:id="@+id/textView23"
@@ -25,13 +27,14 @@
                 android:layout_height="28dp"
                 android:layout_marginTop="16dp"
                 android:text="TextView"
+                android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.496"
+                app:layout_constraintHorizontal_bias="0.501"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.336" />
+                app:layout_constraintVertical_bias="0.337" />
 
             <TextView
                 android:id="@+id/textView24"
@@ -39,12 +42,14 @@
                 android:layout_height="29dp"
                 android:layout_marginTop="16dp"
                 android:text="TextView"
+                android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.452" />
+                app:layout_constraintVertical_bias="0.467" />
 
             <TextView
                 android:id="@+id/textView27"
@@ -52,22 +57,29 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="8dp"
-                android:text="Congraions!"
+                android:text="Congratulations!"
+                android:textColor="#FFFFFF"
                 android:textSize="24sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/textView23"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.09" />
+                app:layout_constraintVertical_bias="0.423" />
 
             <Button
                 android:id="@+id/button5"
                 android:layout_width="233dp"
                 android:layout_height="44dp"
-                android:layout_marginTop="48dp"
-                android:text="Button"
+                android:layout_marginTop="32dp"
+                android:backgroundTint="#FFFFFF"
+                android:text="DONE"
+                android:textColor="#4CAF50"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 app:cornerRadius="30px"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.503"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView24" />
         </androidx.constraintlayout.widget.ConstraintLayout>
