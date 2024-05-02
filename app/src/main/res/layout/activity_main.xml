@@ -212,7 +212,7 @@
         app:srcCompat="@drawable/launcher" />
 
     <ProgressBar
-        android:id="@+id/progressBar"
+        android:id="@+id/progressBar2"
         style="?android:attr/progressBarStyle"
         android:layout_width="60dp"
         android:layout_height="57dp"

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="30px"
+    android:layout_marginEnd="30px"
+    android:background="@drawable/rounded_coreners"
+    android:clipToPadding="false"
+    android:padding="16dp"> <!-- Reference to the shape drawable -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent">
+
+        <!-- Vertical Text Views with Margin -->
+        <TextView
+            android:id="@+id/textViewDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewHeader"
+            android:text="March 22, 2024"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <!-- Divider -->
+        <TextView
+            android:id="@+id/textViewHeader"
+            android:layout_width="322dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="40dp"
+            android:text="Seeking Alpha"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/textViewDate"
+            android:layout_marginTop="12dp"
+            android:background="@android:color/darker_gray" />
+
+        <!-- Bold Text Views -->
+        <TextView
+            android:id="@+id/textViewSubHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/divider"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="0dp"
+            android:text="DOJ sues Apple Inc. for monopolistic practices; stock drops 15%."
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Four-line TextView -->
+        <TextView
+            android:id="@+id/textViewSummary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewSubHeader"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="8dp"
+            android:lines="4"
+            android:text="Could present a buying opportunity. Click for my AAPL update and a review of its antitrust issues."
+            android:textSize="14sp" />
+
+        <!-- Icons Row -->
+        <LinearLayout
+            android:id="@+id/iconsLayout"
+            android:layout_width="350dp"
+            android:layout_height="52dp"
+            android:layout_below="@id/textViewSummary"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="2dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iconChrome"
+                android:layout_width="59dp"
+                android:layout_height="53dp"
+                android:src="@drawable/chrome" />
+
+            <ImageView
+                android:id="@+id/iconTwitter"
+                android:layout_width="59dp"
+                android:layout_height="53dp"
+                android:layout_marginLeft="40dp"
+                android:src="@drawable/twitter_x_icon" />
+
+            <ImageView
+                android:id="@+id/iconFacebook"
+                android:layout_width="59dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="40dp"
+                android:src="@drawable/facebook" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</FrameLayout>

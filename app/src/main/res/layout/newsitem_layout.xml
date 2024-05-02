@@ -25,46 +25,48 @@
                 android:background="@drawable/rounded_coreners"/>
 
             <!-- LinearLayout for horizontal TextViews -->
-            <LinearLayout
-                android:id="@+id/linearLayout"
-                android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="50px"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/imgf"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/headlinef"
+                android:layout_width="87dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="50px"
-                android:layout_marginRight="8dp"
-                android:layout_toLeftOf="@id/imgf"
-                android:orientation="horizontal">
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ellipsize="none"
+                android:gravity="start"
+                android:singleLine="true"
+                android:text="Headline"
+                android:textColor="#7F7D7D"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/headlinef"
-                    android:layout_width="87dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ellipsize="none"
-                    android:gravity="start"
-                    android:singleLine="true"
-                    android:text="Headline"
-                    android:textColor="#7F7D7D"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/datef"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="Date"
-                    android:textColor="#8B8B8B" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/datef"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Date"
+                android:textColor="#8B8B8B" />
+        </LinearLayout>
 
             <!-- TextView for detailed description -->
         <TextView
             android:id="@+id/summf"
-            android:layout_width="246dp"
+            android:layout_width="219dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/linearLayout"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="20dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="11dp"
             android:ellipsize="end"

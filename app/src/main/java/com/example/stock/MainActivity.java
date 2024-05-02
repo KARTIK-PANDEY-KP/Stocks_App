@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
             findViewById(R.id.toolbar).setVisibility(View.GONE);
             findViewById(R.id.divider3).setVisibility(View.GONE);
             findViewById(R.id.imageView).setVisibility(View.GONE);
-            findViewById(R.id.progressBar).setVisibility(View.GONE);
+            findViewById(R.id.progressBar2).setVisibility(View.GONE);
         }
 
         fetchPortfolioData(adapter, adapter2);
@@ -447,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
         findViewById(R.id.divider3).setVisibility(oppositeVisibility);
 
         final View imageview = findViewById(R.id.imageView);
-        final View progressbar = findViewById(R.id.progressBar);
+        final View progressbar = findViewById(R.id.progressBar2);
 
         if(oppositeVisibility == View.GONE){
             progressbar.setVisibility(oppositeVisibility);

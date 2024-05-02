@@ -19,6 +19,7 @@
     import android.widget.Button;
     import android.widget.EditText;
     import android.widget.ImageView;
+    import android.widget.ProgressBar;
     import android.widget.ScrollView;
     import android.widget.TextView;
     import android.widget.Toast;
@@ -65,7 +66,7 @@
     import okhttp3.RequestBody;
     import okhttp3.Response;
 
-    public class searchactivity extends AppCompatActivity {
+    public class searchactivity extends AppCompatActivity implements newsModelViewInterface {
         ArrayList<String> peers = new ArrayList<>();
         ArrayList<newsmodel> newsmodels = new ArrayList<>();
         Toolbar mActionBarToolbar;
@@ -141,9 +142,17 @@
             mActionBarToolbar.setTitle(ticker);
             setSupportActionBar(mActionBarToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ProgressBar pgb2 = findViewById(R.id.progressBar2);
+            pgb2.setVisibility(View.VISIBLE);
+
+            ScrollView scrollView = findViewById(R.id.scrlview);
+            for (int i = 0; i < scrollView.getChildCount(); i++) {
+                View child = scrollView.getChildAt(i);
+                child.setVisibility(View.GONE);
+            }
         }
         public void setupnewsmodel() {
-                for (int i = 0; i < stock_data_news.length(); i++) {
+                for (int i = 1; i < stock_data_news.length(); i++) {
                     JSONObject newsObject = stock_data_news.optJSONObject(i);
 
                     String heading = newsObject.optString("source");
@@ -162,7 +171,7 @@
                     newsmodels.add(news);
                 }
             RecyclerView recyclerView = findViewById(R.id.newsRecyclerView);
-            NewsAdapter adapter1 = new NewsAdapter(this, newsmodels);
+            NewsAdapter adapter1 = new NewsAdapter(this, newsmodels, this);
             recyclerView.setAdapter(adapter1);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
         }
@@ -372,6 +381,8 @@
                 initRecyclerView();
                 displayFirstNewsItem();
                 setupnewsmodel();
+                ProgressBar pgb2 = findViewById(R.id.progressBar2);
+                pgb2.setVisibility(View.GONE);
                 ScrollView scrollView = findViewById(R.id.scrlview);
                 for (int i = 0; i < scrollView.getChildCount(); i++) {
                     View child = scrollView.getChildAt(i);
@@ -380,6 +391,9 @@
             }
             else if(newValue == -1) {
                 mActionBarToolbar.setTitle(ticker);
+                ProgressBar pgb2 = findViewById(R.id.progressBar2);
+                pgb2.setVisibility(View.VISIBLE);
+
                 ScrollView scrollView = findViewById(R.id.scrlview);
                 for (int i = 0; i < scrollView.getChildCount(); i++) {
                     View child = scrollView.getChildAt(i);
@@ -1083,6 +1097,20 @@
         private void showErrorMessage(VolleyError error) {
             // You can improve error handling by analyzing the error object
             Toast.makeText(getApplicationContext(), "Network error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onitemclick(int position) {
+            newsDialog();
+        }
+        public void newsDialog() {
+            final Dialog dialog3 = new Dialog(searchactivity.this);
+            dialog3.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog3.setCancelable(true);
+            dialog3.setContentView(R.layout.newsmodal_layout);
+            dialog3.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            dialog3.show();
         }
     }
 
