@@ -26,7 +26,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -434,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
         findViewById(R.id.divider).setVisibility(visibility);
         findViewById(R.id.curdate).setVisibility(visibility);
         findViewById(R.id.Portfolio_title).setVisibility(visibility);
-        findViewById(R.id.textView3).setVisibility(visibility);
+        findViewById(R.id.textView301).setVisibility(visibility);
         findViewById(R.id.textView4).setVisibility(visibility);
         findViewById(R.id.networth).setVisibility(visibility);
         findViewById(R.id.cashbalance).setVisibility(visibility);

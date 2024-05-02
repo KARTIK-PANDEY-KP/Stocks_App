@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- ImageView with rounded corners -->
+
+
+    <ImageView
+    android:id="@+id/newsImage"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:src="@drawable/search"
+    android:scaleType="fitCenter"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/rounded_coreners" />
+
+
+    <!-- LinearLayout for holding two TextViews side by side -->
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/newsImage"
+        android:layout_marginLeft="40px"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/headlinef"
+            android:layout_width="147dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="none"
+            android:gravity="start"
+            android:singleLine="true"
+            android:text="Headline"
+            android:textColor="#7F7D7D"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/textView201"
+            android:layout_width="156dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="none"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="Date"
+            android:textColor="#8B8B8B" />
+    </LinearLayout>
+
+    <!-- Another TextView with rounded corners below the two TextViews -->
+    <TextView
+        android:id="@+id/textView301"
+        android:layout_width="385dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout"
+        android:layout_alignStart="@+id/linearLayout"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="11dp"
+        android:background="@drawable/rounded_coreners"
+        android:singleLine="true"
+
+        android:padding="8dp"
+        android:text="Summary"
+        android:textColor="#000000"
+        android:textStyle="bold" />
+
+</RelativeLayout>

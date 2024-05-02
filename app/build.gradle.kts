@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.recyclerview.swipedecorator)
     implementation(libs.okhttp)
     implementation(libs.viewpager2)
+    implementation(libs.picasso)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

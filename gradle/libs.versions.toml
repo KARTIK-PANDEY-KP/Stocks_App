@@ -11,6 +11,11 @@ volley = "1.2.1"
 recyclerviewSwipedecorator = "1.4"
 okhttp = "5.0.0-alpha.14"
 viewpager2 = "1.1.0-beta02"
+glide = "5.0.0-rc01"
+compiler = "5.0.0-rc01"
+glideVersion = "4.16.0"
+compilerVersion = "4.14.2"
+picasso = "2.71828"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -24,6 +29,11 @@ volley = { group = "com.android.volley", name = "volley", version.ref = "volley"
 recyclerview-swipedecorator = { group = "it.xabaras.android", name = "recyclerview-swipedecorator", version.ref = "recyclerviewSwipedecorator" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.0" }
 viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "viewpager2" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "compiler" }
+github-glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glideVersion" }
+glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "compilerVersion" }
+picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

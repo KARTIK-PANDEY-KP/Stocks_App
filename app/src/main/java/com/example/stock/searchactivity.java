@@ -19,6 +19,7 @@
     import android.widget.Button;
     import android.widget.EditText;
     import android.widget.ImageView;
+    import android.widget.ScrollView;
     import android.widget.TextView;
     import android.widget.Toast;
 
@@ -41,6 +42,7 @@
     import com.android.volley.toolbox.Volley;
     import com.google.android.material.tabs.TabLayout;
     import com.google.android.material.tabs.TabLayoutMediator;
+    import com.squareup.picasso.Picasso;
 
     import org.json.JSONArray;
     import org.json.JSONException;
@@ -48,6 +50,10 @@
 
     import java.io.IOException;
     import java.text.NumberFormat;
+    import java.time.Instant;
+    import java.time.LocalDateTime;
+    import java.time.ZoneId;
+    import java.time.temporal.ChronoUnit;
     import java.util.ArrayList;
     import java.util.Locale;
     import java.util.Objects;
@@ -61,6 +67,7 @@
 
     public class searchactivity extends AppCompatActivity {
         ArrayList<String> peers = new ArrayList<>();
+        ArrayList<newsmodel> newsmodels = new ArrayList<>();
         Toolbar mActionBarToolbar;
         private RequestQueue requestQueue;  // S
         private String ticker;
@@ -88,6 +95,7 @@
 
 
 
+
             // TICKER value initialize from the Intent
             this.ticker = getIntent().getStringExtra("query");
             requestQueue = Volley.newRequestQueue(this);
@@ -110,6 +118,10 @@
                     }).attach();
 
             //FETCHES AND DISPLAYS GENERAL DATA LIKE NAME ETC - PART 1
+
+// To hide all child views inside the ScrollView
+
+
             fetchStockData();
             fetchSentimentData();
             displayrecommendationchart();
@@ -129,6 +141,71 @@
             mActionBarToolbar.setTitle(ticker);
             setSupportActionBar(mActionBarToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        public void setupnewsmodel() {
+                for (int i = 0; i < stock_data_news.length(); i++) {
+                    JSONObject newsObject = stock_data_news.optJSONObject(i);
+
+                    String heading = newsObject.optString("source");
+                    String summary = newsObject.optString("summary");
+                    long datetime = newsObject.optLong("datetime");
+                    String imgurl = newsObject.optString("image");
+                    String timeAgo = convertTimeToRelative(datetime);
+
+
+                    Log.d("NEWS_MODEL", "Heading: " + heading);
+                    Log.d("NEWS_MODEL", "Summary: " + summary);
+                    Log.d("NEWS_MODEL", "Datetime: " + timeAgo);
+                    Log.d("NEWS_MODEL", "Image URL: " + imgurl);
+
+                    newsmodel news = new newsmodel(heading, summary, String.valueOf(timeAgo), imgurl);
+                    newsmodels.add(news);
+                }
+            RecyclerView recyclerView = findViewById(R.id.newsRecyclerView);
+            NewsAdapter adapter1 = new NewsAdapter(this, newsmodels);
+            recyclerView.setAdapter(adapter1);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        }
+        public void displayFirstNewsItem() {
+            try {
+
+                    JSONObject firstItem = stock_data_news.optJSONObject(0);
+                    String image = firstItem.optString("image");
+                    String source = firstItem.optString("source");
+                    long dateTimeStamp = firstItem.optLong("datetime");
+                    String headline = firstItem.optString("headline");
+                    ImageView newsImageView;
+                    TextView headlineTextView;
+                    TextView dateTimeTextView;
+                    TextView summaryTextView;
+
+                    newsImageView = findViewById(R.id.newsImage);
+                    headlineTextView = findViewById(R.id.headlinef);
+                    dateTimeTextView = findViewById(R.id.textView201);
+                    summaryTextView = findViewById(R.id.textView301);
+
+                    // Convert Unix timestamp to "x hours ago"
+                    String timeAgo = convertTimeToRelative(dateTimeStamp);
+                    Picasso.get().load(image).into(newsImageView);
+                    summaryTextView.setText(headline);
+                    dateTimeTextView.setText(timeAgo);
+                    headlineTextView.setText(source);
+
+                    System.out.println("Image URL: " + image);
+                    System.out.println("Source: " + source);
+                    System.out.println("Time: " + timeAgo);
+                    System.out.println("Headline: " + headline);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Function to convert Unix timestamp to relative time (e.g., "x hours ago")
+        public static String convertTimeToRelative(long dateTimeStamp) {
+            LocalDateTime timeThen = LocalDateTime.ofInstant(Instant.ofEpochSecond(dateTimeStamp), ZoneId.systemDefault());
+            LocalDateTime timeNow = LocalDateTime.now();
+            long hours = ChronoUnit.HOURS.between(timeThen, timeNow);
+            return hours + " hours ago";
         }
         private void StockDataFetcherNews() {
             String url = "https://nodeserverass3.wl.r.appspot.com/news/?symbol="+ticker;
@@ -293,9 +370,21 @@
                 setaboutandstats();
                 setinsights();
                 initRecyclerView();
+                displayFirstNewsItem();
+                setupnewsmodel();
+                ScrollView scrollView = findViewById(R.id.scrlview);
+                for (int i = 0; i < scrollView.getChildCount(); i++) {
+                    View child = scrollView.getChildAt(i);
+                    child.setVisibility(View.VISIBLE);
+                }
             }
             else if(newValue == -1) {
                 mActionBarToolbar.setTitle(ticker);
+                ScrollView scrollView = findViewById(R.id.scrlview);
+                for (int i = 0; i < scrollView.getChildCount(); i++) {
+                    View child = scrollView.getChildAt(i);
+                    child.setVisibility(View.GONE);
+                }
                 fetchStockData();
                 fetchSentimentData();
                 displayrecommendationchart();
