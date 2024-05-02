@@ -143,20 +143,27 @@
             webView.loadUrl(recomm_url);
             WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);
+
             WebView webView2 = findViewById(R.id.webview2);
-            String recomm_url2 = null;
-            if(Objects.equals(ticker, "NVDA")){
-                recomm_url2= "file:///android_asset/epschart.html";
-            }
-            if(Objects.equals(ticker, "AAPL")){
-                recomm_url2 = "file:///android_asset/epschart.html";
-            }
-            if(Objects.equals(ticker, "QCOM")){
-                recomm_url2 = "file:///android_asset/epschart.html";
-            }
-            webView.loadUrl(recomm_url2);
+            webView2.loadUrl("file:///android_asset/epschart.html");
             WebSettings webSettings2 = webView2.getSettings();
             webSettings2.setJavaScriptEnabled(true);
+
+
+//            WebView webView2 = findViewById(R.id.webview2);
+//            String recomm_url2 = "file:///android_asset/epschart.html";
+//            if(Objects.equals(ticker, "NVDA")){
+//                recomm_url2= "file:///android_asset/epschart.html";
+//            }
+//            if(Objects.equals(ticker, "AAPL")){
+//                recomm_url2 = "file:///android_asset/epschart.html";
+//            }
+//            if(Objects.equals(ticker, "QCOM")){
+//                recomm_url2 = "file:///android_asset/epschart.html";
+//            }
+//            webView2.loadUrl(recomm_url2);
+//            WebSettings webSettings2 = webView2.getSettings();
+//            webSettings2.setJavaScriptEnabled(true);
             //
         }
         public void setinsights() {
