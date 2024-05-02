@@ -1,8 +1,11 @@
     package com.example.stock;
 
     import android.app.Dialog;
+    import android.content.Intent;
     import android.graphics.Color;
+    import android.graphics.Paint;
     import android.graphics.drawable.ColorDrawable;
+    import android.net.Uri;
     import android.os.Bundle;
     import android.text.Editable;
     import android.text.TextWatcher;
@@ -24,6 +27,8 @@
     import androidx.core.graphics.Insets;
     import androidx.core.view.ViewCompat;
     import androidx.core.view.WindowInsetsCompat;
+    import androidx.recyclerview.widget.LinearLayoutManager;
+    import androidx.recyclerview.widget.RecyclerView;
     import androidx.viewpager2.widget.ViewPager2;
 
     import com.android.volley.RequestQueue;
@@ -40,6 +45,7 @@
 
     import java.io.IOException;
     import java.text.NumberFormat;
+    import java.util.ArrayList;
     import java.util.Locale;
     import java.util.Objects;
     import java.util.concurrent.atomic.AtomicInteger;
@@ -51,8 +57,11 @@
     import okhttp3.Response;
 
     public class searchactivity extends AppCompatActivity {
-        private RequestQueue requestQueue;  // Declare the RequestQueue.
+        ArrayList<String> peers = new ArrayList<>();
+        Toolbar mActionBarToolbar;
+        private RequestQueue requestQueue;  // S
         private String ticker;
+        ArrayList<String> old_queries = new  ArrayList<>();
         private int value = -1;
         int star_status;
         private int stock_qty;
@@ -109,10 +118,26 @@
             });
 
             // TOOLBAR
-            Toolbar mActionBarToolbar = findViewById(R.id.toolbar_page2);
+            mActionBarToolbar = findViewById(R.id.toolbar_page2);
             mActionBarToolbar.setTitle(ticker);
             setSupportActionBar(mActionBarToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        private void initRecyclerView() {
+
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+            RecyclerView recyclerView = findViewById(R.id.recycleView);
+            recyclerView.setLayoutManager(layoutManager);
+            RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, peers);
+            adapter.selectedName.setOnChangeListener((oldValue, newValue) -> {
+                // React to the change in selected name
+                Log.d("MainActivity", "Selected name changed from " + oldValue + " to " + newValue);
+                old_queries.add(this.ticker);
+                this.ticker = newValue;
+                mActionBarToolbar.setTitle(ticker);
+                setValue(-1);
+            });
+            recyclerView.setAdapter(adapter);
         }
         public void setValue(int newValue) {
             if (newValue != this.value) {
@@ -133,9 +158,26 @@
             Log.d("DEBUG", "onValueChanged: " + newValue);
             if(newValue == 1) {
                 setPortfolio();
+                setaboutandstats();
+                initRecyclerView();
             }
             else if(newValue == -1) {
+                mActionBarToolbar.setTitle(ticker);
                 fetchStockData();
+                MenuItem star = menu.findItem(R.id.star);
+
+                fetchStarStatus(star, new FetchStatusCallback() {
+                    @Override
+                    public void onStatusFetched(int status) {
+                        if (status == 1) {
+                            Log.d("Status", "Star status is full.");
+                        } else {
+                            Log.d("Status", "Star status is not full.");
+                        }
+                        star_status = status;
+                        updateStarIcon_NOT_WATCHLLIST(star);
+                    }
+                });
             }
 //            else {
 //            }
@@ -502,9 +544,12 @@
                 }
             });
         }
+        private Menu menu;
         public boolean onCreateOptionsMenu(Menu menu) {
             getMenuInflater().inflate(R.menu.menu_stock_page, menu);
             MenuItem star = menu.findItem(R.id.star);
+            this.menu = menu;
+
             fetchStarStatus(star, new FetchStatusCallback() {
                 @Override
                 public void onStatusFetched(int status) {
@@ -525,12 +570,87 @@
 
             return true;
         }
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+                case android.R.id.home:
+//                    old_queries.add("1");
+                    if (old_queries.size() != 0) {
+                        // Handle the back button action
+                        this.ticker = old_queries.remove(old_queries.size() - 1);
+                        setValue(-1);
+                        Log.d("CLICKS", "onCreateOptionsMenu; back clicked): bla bla" + this.ticker);
+                        return true;
+                    }
+                    else {
+                        return super.onOptionsItemSelected(item);
+                    }
+                default: {
+                    return super.onOptionsItemSelected(item);
+                }
+            }
+        }
+
+        public void setaboutandstats() {
+            try {
+                JSONArray peersJsonArray = stock_data_general.getJSONArray("peers");
+                for (int i = 0; i < peersJsonArray.length(); i++) {
+                    peers.add(peersJsonArray.getString(i));
+                }
+                // Now you have the peers list and can use it as needed
+                Log.d("Peers List", peers.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            TextView textViewIPODate, textViewCompanyName, textViewWebsite;
+            TextView textViewOpenPrice, textViewLowPrice, textViewHighPrice, textViewPreviousClose;
+
+            textViewOpenPrice = findViewById(R.id.textView22);
+            textViewLowPrice = findViewById(R.id.textView30);
+            textViewHighPrice = findViewById(R.id.textView29);
+            textViewPreviousClose = findViewById(R.id.textView20);
+
+            textViewIPODate = findViewById(R.id.textView35);
+            textViewCompanyName = findViewById(R.id.textView36);
+            textViewWebsite = findViewById(R.id.textView37);
+            String ipoDate = stock_data_general.optString("ipo");
+            String companyName = stock_data_general.optString("finnhubIndustry");
+            String companyWebsite = stock_data_general.optString("weburl");
+            Log.d("DEBUG", "setaboutandstats: " + ipoDate+ companyWebsite + companyName);
+            String openPrice = "$" + stock_data_quote.optString("o");
+            String lowPrice = "$" + stock_data_quote.optString("l");
+            String highPrice = "$" + stock_data_quote.optString("h");
+            String previousClose = "$" + stock_data_quote.optString("pc");
+
+            textViewOpenPrice.setText(openPrice);
+            textViewLowPrice.setText(lowPrice);
+            textViewHighPrice.setText(highPrice);
+            textViewPreviousClose.setText(previousClose);
+
+            textViewIPODate.setText(ipoDate);
+            textViewCompanyName.setText(companyName);
+            textViewWebsite.setText(companyWebsite);
+            textViewWebsite.setPaintFlags(textViewWebsite.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
+            textViewWebsite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Specify the URL you want to display
+                    Uri uri = Uri.parse(companyWebsite);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                }
+
+            });
+        }
         private void fetchStockData() {
             String url = "https://nodeserverass3.wl.r.appspot.com/submit?text=" + ticker;
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.GET, url, null,
                     response -> {
                         Log.d("Response", response.toString());
                         stock_data_general = response;
+
                         String get_quote_url = "https://nodeserverass3.wl.r.appspot.com/quote/?text=" + ticker;
                         JsonObjectRequest jsonObjectRequest_quote = new JsonObjectRequest(com.android.volley.Request.Method.GET, get_quote_url, null,
                                 response2 -> {
@@ -610,6 +730,11 @@
                     response -> {
                         Log.d("RESPONSE_FAV_PAGE_2", response.toString());
                         AtomicInteger ret = new AtomicInteger(0);
+                        Log.d("in fetch_star_status", "fetchStarStatus: Objects.equals(ticker, ticker_response) == true before");
+
+                        ret.set(0);
+                        Log.d("in fetch_star_status", "fetchStarStatus: Objects.equals(ticker, ticker_response) == true aafter");
+
                         for (int i = 0; i < response.length(); i++) {
                             String ticker_response = response.optJSONObject(i).optString("stock_ticker");
                             if (Objects.equals(ticker, ticker_response)) {
@@ -642,6 +767,19 @@
                 star.setIcon(R.drawable.star_border);
                 Toast.makeText(this, ticker + " is remov from favorites", Toast.LENGTH_SHORT).show();
                 deleteStock(ticker);
+            }
+        }
+        private void updateStarIcon_NOT_WATCHLLIST(MenuItem star) {
+            if (star_status == 0) {
+                Log.d("DEBUG", "USTAR: NW");
+                star.setIcon(R.drawable.star_border);
+                Log.d("DEBUG", "USTAR: CAHNGES - WN" + stock_data_general.toString());
+//                Toast.makeText(this, ticker + " is added to favorites", Toast.LENGTH_SHORT).show();
+//                addStock(ticker, stock_data_general.optString("name"));
+            } else {
+                star.setIcon(R.drawable.full_star);
+//                Toast.makeText(this, ticker + " is remov from favorites", Toast.LENGTH_SHORT).show();
+//                deleteStock(ticker);
             }
         }
         public void deleteStock(String ticker) {
