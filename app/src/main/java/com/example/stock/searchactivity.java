@@ -35,6 +35,7 @@
     import com.android.volley.VolleyError;
     import com.android.volley.toolbox.JsonArrayRequest;
     import com.android.volley.toolbox.JsonObjectRequest;
+    import com.android.volley.toolbox.StringRequest;
     import com.android.volley.toolbox.Volley;
     import com.google.android.material.tabs.TabLayout;
     import com.google.android.material.tabs.TabLayoutMediator;
@@ -65,7 +66,7 @@
         private int value = -1;
         int star_status;
         private int stock_qty;
-        JSONObject stock_data_general, stock_data_quote, stock_data_portfolio;
+        JSONObject stock_data_general, stock_data_quote, stock_data_portfolio, stock_data_insights;
         Button tradeButton;
 
         @Override
@@ -107,6 +108,7 @@
 
             //FETCHES AND DISPLAYS GENERAL DATA LIKE NAME ETC - PART 1
             fetchStockData();
+            fetchSentimentData();
             // PART 1 DONE
             tradeButton = findViewById(R.id.tradeButton);
             tradeButton.setOnClickListener(new View.OnClickListener() {
@@ -123,6 +125,64 @@
             setSupportActionBar(mActionBarToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        public void setinsights() {
+            TextView insightsCompany, totalMSRP, positiveMSRP, negativeMSRP, totalChange, positiveChange, negativeChange;
+            insightsCompany = findViewById(R.id.ingightsCompany);
+            totalMSRP = findViewById(R.id.totalMSRP);
+            positiveMSRP = findViewById(R.id.positiveMSRP);
+            negativeMSRP = findViewById(R.id.negativeMSRP);
+            totalChange = findViewById(R.id.totalChange);
+            positiveChange = findViewById(R.id.positiveChange);
+            negativeChange = findViewById(R.id.negativeChange);
+            Log.d("fetchSentimentData", "Response received: jkaSJKAKASKLDF ASKLF ASFKLAS FDKLDS FASKALS");
+
+            totalMSRP.setText(String.valueOf(stock_data_insights.optDouble("totalMspr")));
+            positiveMSRP.setText(String.valueOf(stock_data_insights.optDouble("positiveMspr")));
+            negativeMSRP.setText(String.valueOf(stock_data_insights.optDouble("negativeMspr")));
+            totalChange.setText(String.valueOf(stock_data_insights.optDouble("totalChange")));
+            Log.d("fetchSentimentData", "Response received: 1233334jkaSJKAKASKLDF ASKLF ASFKLAS FDKLDS FASKALS");
+
+            positiveChange.setText(String.valueOf(stock_data_insights.optDouble("positiveChange")));
+            negativeChange.setText(String.valueOf(stock_data_insights.optDouble("negativeChange")));
+            Log.d("fetchSentimentData", "Response received: 1233334jkaSJKAKAS567865789KLDF ASKLF ASFKLAS FDKLDS FASKALS");
+
+            insightsCompany.setText(stock_data_general.optString("name"));
+            Log.d("fetchSentimentData", "Response received: jkaSJKAKASKLDF ASKLF123421341242 ASFKLAS FDKLDS FASKALS");
+
+
+        }
+        private void fetchSentimentData() {
+            String url = "https://nodeserverass3.wl.r.appspot.com/insider-sentiment/?text=" + ticker;
+            Log.d("fetchSentimentData", "Fetching sentiment data for ticker: " + ticker);
+
+            StringRequest stringRequest = new StringRequest(com.android.volley.Request.Method.GET, url,
+                    new  com.android.volley.Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.i("fetchSentimentData", "Response received: " + response);
+                            try {
+                                stock_data_insights = new JSONObject(response);
+                                Log.i("fetchSentimentData", "Response received: jkaSJKAK" + response);
+                                setValue(getValue()+1);
+                                Log.d("fetchSentimentData", "Insights set successfully");
+                            } catch (JSONException e) {
+                                Log.e("fetchSentimentData", "JSON parsing error: ", e);
+                            }
+                        }
+                    }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("fetchSentimentData", "Error fetching data: ", error);
+                }
+            });
+
+            // Adding request to request queue
+            RequestQueue queue = Volley.newRequestQueue(this);
+            queue.add(stringRequest);
+            Log.d("fetchSentimentData", "Request added to queue");
+        }
+
         private void initRecyclerView() {
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -156,14 +216,16 @@
             // Code to execute when the value changes
             System.out.println("Value changed to: " + newValue);
             Log.d("DEBUG", "onValueChanged: " + newValue);
-            if(newValue == 1) {
+            if(newValue == 2) {
                 setPortfolio();
                 setaboutandstats();
+                setinsights();
                 initRecyclerView();
             }
             else if(newValue == -1) {
                 mActionBarToolbar.setTitle(ticker);
                 fetchStockData();
+                fetchSentimentData();
                 MenuItem star = menu.findItem(R.id.star);
 
                 fetchStarStatus(star, new FetchStatusCallback() {
@@ -344,7 +406,6 @@
                     }
 
                 });
-
                 double finalMoneyValue = moneyValue;
                 button.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
@@ -386,7 +447,7 @@
                         double stockPrice = stock_data_quote.optDouble("c");
                         double totalCost = stockPrice * shares;
 
-                        if (shares >= stock_qty || (stock_qty == 0 && shares != 0)){
+                        if (shares > stock_qty || (stock_qty == 0 && shares != 0)){
                             Toast.makeText(searchactivity.this, "Not enough shares to sell", Toast.LENGTH_SHORT).show();
                         } else if (shares == 0) {
                             Toast.makeText(searchactivity.this, "Please enter a valid amount", Toast.LENGTH_SHORT).show();
@@ -437,7 +498,7 @@
 
             try {
                 currentStockPrice = stock_data_quote.optDouble("c");
-                Log.d("DEBUG", "buyStock: + " + currentStockPrice);
+                Log.d("DEBUG", "Stock: + " + currentStockPrice);
                 // Now create the JSON body to send to the server
                 JSONObject requestBody = new JSONObject();
                 requestBody.put("ticker", ticker);
@@ -532,8 +593,9 @@
                         // Since the response handling often updates UI, ensure you switch back to the main thread if necessary
                         runOnUiThread(() -> {
                             // Update UI or show a success message
+                            setValue(-1);
+
                         });
-                        setValue(-1);
 
                     } else {
                         // Handle the failure case

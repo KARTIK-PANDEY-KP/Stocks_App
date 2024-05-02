@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="290dp">
+
+            <TableLayout
+                android:layout_width="366dp"
+                android:layout_height="195dp"
+                android:padding="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.977">
+
+                <!-- Header Row -->
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/ingightsCompany"
+                        android:layout_width="112dp"
+                        android:layout_margin="3dp"
+                        android:background="#DADADA"
+                        android:padding="8dp"
+                        android:text="Apple Inc" />
+
+                    <TextView
+                        android:layout_width="101dp"
+                        android:layout_margin="3dp"
+                        android:background="#DADADA"
+                        android:padding="8dp"
+                        android:text="MSRP" />
+
+                    <TextView
+                        android:layout_width="109dp"
+                        android:layout_margin="3dp"
+                        android:background="#DADADA"
+                        android:padding="8dp"
+                        android:text="Change" />
+
+                </TableRow>
+
+                <!-- Total Row -->
+                <TableRow android:layout_width="wrap_content">
+
+                    <TextView
+                        android:layout_margin="3dp"
+                        android:background="#DADADA"
+                        android:padding="8dp"
+                        android:text="Total" />
+
+
+                    <TextView
+                        android:id="@+id/totalMSRP"
+                        android:layout_margin="3dp"
+                        android:background="#F3F3F3"
+                        android:padding="8dp"
+                        android:text="-654.26" />
+
+                    <TextView
+                        android:id="@+id/totalChange"
+                        android:layout_margin="3dp"
+                        android:background="#F3F3F3"
+                        android:padding="8dp"
+                        android:text="-2712296.0" />
+
+                </TableRow>
+
+                <!-- Positive Row -->
+
+                <!-- Negative Row -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_margin="3dp"
+                        android:background="#DADADA"
+                        android:padding="8dp"
+                        android:text="Positive" />
+
+                    <TextView
+                        android:id="@+id/positiveMSRP"
+                        android:layout_margin="3dp"
+                        android:background="#F3F3F3"
+                        android:padding="8dp"
+                        android:text="200.0" />
+
+                    <TextView
+                        android:id="@+id/positiveChange"
+                        android:layout_margin="3dp"
+                        android:background="#F3F3F3"
+                        android:padding="8dp"
+                        android:text="827822.0" />
+
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:layout_margin="3dp"
+                        android:background="#DADADA"
+                        android:padding="8dp"
+                        android:text="Negative" />
+
+                    <TextView
+                        android:id="@+id/negativeMSRP"
+                        android:layout_margin="3dp"
+                        android:background="#F3F3F3"
+                        android:padding="8dp"
+                        android:text="-854.26" />
+
+                    <TextView
+                        android:id="@+id/negativeChange"
+                        android:layout_margin="3dp"
+                        android:background="#F3F3F3"
+                        android:padding="8dp"
+                        android:text="-3540118.0" />
+
+                </TableRow>
+            </TableLayout>
+
+            <TextView
+                android:id="@+id/textView52"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="64dp"
+                android:text="Social Sentiments"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView53"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Insights"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
