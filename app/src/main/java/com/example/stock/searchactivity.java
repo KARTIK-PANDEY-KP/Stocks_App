@@ -14,6 +14,8 @@
     import android.view.MenuItem;
     import android.view.View;
     import android.view.Window;
+    import android.webkit.WebSettings;
+    import android.webkit.WebView;
     import android.widget.Button;
     import android.widget.EditText;
     import android.widget.ImageView;
@@ -109,6 +111,7 @@
             //FETCHES AND DISPLAYS GENERAL DATA LIKE NAME ETC - PART 1
             fetchStockData();
             fetchSentimentData();
+            displayrecommendationchart();
             // PART 1 DONE
             tradeButton = findViewById(R.id.tradeButton);
             tradeButton.setOnClickListener(new View.OnClickListener() {
@@ -125,7 +128,23 @@
             setSupportActionBar(mActionBarToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
+        public void displayrecommendationchart(){
+            WebView webView = findViewById(R.id.recommendation);
+            String recomm_url = null;
+            if(Objects.equals(ticker, "NVDA")){
+                recomm_url = "file:///android_asset/recommendation.html";
+            }
+            if(Objects.equals(ticker, "AAPL")){
+                recomm_url = "file:///android_asset/recommendation.html";
+            }
+            if(Objects.equals(ticker, "QCOM")){
+                recomm_url = "file:///android_asset/recommendation.html";
+            }
+            webView.loadUrl(recomm_url);
+            WebSettings webSettings = webView.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            //
+        }
         public void setinsights() {
             TextView insightsCompany, totalMSRP, positiveMSRP, negativeMSRP, totalChange, positiveChange, negativeChange;
             insightsCompany = findViewById(R.id.ingightsCompany);
@@ -226,6 +245,7 @@
                 mActionBarToolbar.setTitle(ticker);
                 fetchStockData();
                 fetchSentimentData();
+                displayrecommendationchart();
                 MenuItem star = menu.findItem(R.id.star);
 
                 fetchStarStatus(star, new FetchStatusCallback() {
