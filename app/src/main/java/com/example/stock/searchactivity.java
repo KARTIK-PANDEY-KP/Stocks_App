@@ -142,7 +142,7 @@
                             try {
                                 stock_data_news = new JSONArray(response);
                                 Log.i("fetchSentimentData", "Response received: jkaSJKAK" + response);
-//                                setValue(getValue()+1);
+                                setValue(getValue()+1);
                                 Log.d("fetchSentimentData", "Insights set successfully");
                             } catch (JSONException e) {
                                 Log.e("fetchSentimentData", "JSON parsing error: ", e);
@@ -288,7 +288,7 @@
             // Code to execute when the value changes
             System.out.println("Value changed to: " + newValue);
             Log.d("DEBUG", "onValueChanged: " + newValue);
-            if(newValue == 2) {
+            if(newValue == 3) {
                 setPortfolio();
                 setaboutandstats();
                 setinsights();
