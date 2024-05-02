@@ -156,7 +156,9 @@
                     JSONObject newsObject = stock_data_news.optJSONObject(i);
 
                     String heading = newsObject.optString("source");
-                    String summary = newsObject.optString("summary");
+                    String summary = newsObject.optString("headline");
+                    String ambiguiity_in_assignment = newsObject.optString("summary");
+
                     long datetime = newsObject.optLong("datetime");
                     String imgurl = newsObject.optString("image");
                     String timeAgo = convertTimeToRelative(datetime);
@@ -167,7 +169,7 @@
                     Log.d("NEWS_MODEL", "Datetime: " + timeAgo);
                     Log.d("NEWS_MODEL", "Image URL: " + imgurl);
 
-                    newsmodel news = new newsmodel(heading, summary, String.valueOf(timeAgo), imgurl);
+                    newsmodel news = new newsmodel(heading, summary, String.valueOf(timeAgo), imgurl, ambiguiity_in_assignment);
                     newsmodels.add(news);
                 }
             RecyclerView recyclerView = findViewById(R.id.newsRecyclerView);
@@ -1101,13 +1103,39 @@
 
         @Override
         public void onitemclick(int position) {
-            newsDialog();
+            newsDialog(position);
         }
-        public void newsDialog() {
+        public void newsDialog( int position) {
             final Dialog dialog3 = new Dialog(searchactivity.this);
             dialog3.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog3.setCancelable(true);
             dialog3.setContentView(R.layout.newsmodal_layout);
+
+            TextView textViewDate;
+            TextView textViewHeader;
+            TextView textViewSubHeader;
+            TextView textViewSummary;
+            ImageView iconChrome;
+            ImageView iconTwitter;
+            ImageView iconFacebook;
+
+            textViewDate = dialog3.findViewById(R.id.textViewDate);
+            textViewHeader = dialog3.findViewById(R.id.textViewHeader);
+            textViewSubHeader = dialog3.findViewById(R.id.textViewSubHeader);
+            textViewSummary = dialog3.findViewById(R.id.textViewSummary);
+
+            // Initialize ImageViews
+            iconChrome = findViewById(R.id.iconChrome);
+            iconTwitter = findViewById(R.id.iconTwitter);
+            iconFacebook = findViewById(R.id.iconFacebook);
+
+            newsmodel newsItem = newsmodels.get(position);
+
+            textViewDate.setText(newsItem.getDatetime());
+            textViewHeader.setText(newsItem.getHeading());
+            textViewSummary.setText(newsItem.getAmbiguiity_in_assignment());  // Adjust as needed based on actual model attributes
+            textViewSubHeader.setText(newsItem.getSummary());
+
             dialog3.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
             dialog3.show();
