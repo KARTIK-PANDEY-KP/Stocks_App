@@ -69,6 +69,7 @@
         int star_status;
         private int stock_qty;
         JSONObject stock_data_general, stock_data_quote, stock_data_portfolio, stock_data_insights;
+        JSONArray stock_data_news;
         Button tradeButton;
 
         @Override
@@ -112,7 +113,8 @@
             fetchStockData();
             fetchSentimentData();
             displayrecommendationchart();
-            // PART 1 DONE
+            StockDataFetcherNews();
+//             PART 1 DONE
             tradeButton = findViewById(R.id.tradeButton);
             tradeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -127,6 +129,36 @@
             mActionBarToolbar.setTitle(ticker);
             setSupportActionBar(mActionBarToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        private void StockDataFetcherNews() {
+            String url = "https://nodeserverass3.wl.r.appspot.com/news/?symbol="+ticker;
+            Log.d("fetchSentimentData", "Fetching sentiment data for ticker: " + ticker);
+
+            StringRequest stringRequest = new StringRequest(com.android.volley.Request.Method.GET, url,
+                    new  com.android.volley.Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.i("fetchSentimentData", "Response received: " + response);
+                            try {
+                                stock_data_news = new JSONArray(response);
+                                Log.i("fetchSentimentData", "Response received: jkaSJKAK" + response);
+//                                setValue(getValue()+1);
+                                Log.d("fetchSentimentData", "Insights set successfully");
+                            } catch (JSONException e) {
+                                Log.e("fetchSentimentData", "JSON parsing error: ", e);
+                            }
+                        }
+                    }, new com.android.volley.Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("fetchSentimentData", "Error fetching data: ", error);
+                }
+            });
+
+            // Adding request to request queue
+            RequestQueue queue = Volley.newRequestQueue(this);
+            queue.add(stringRequest);
+            Log.d("fetchSentimentData", "Request added to queue");
         }
         public void displayrecommendationchart(){
             WebView webView = findViewById(R.id.recommendation);
@@ -267,6 +299,7 @@
                 fetchStockData();
                 fetchSentimentData();
                 displayrecommendationchart();
+                StockDataFetcherNews();
                 MenuItem star = menu.findItem(R.id.star);
 
                 fetchStarStatus(star, new FetchStatusCallback() {
