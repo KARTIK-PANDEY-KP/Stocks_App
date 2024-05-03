@@ -379,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
             for (int i = 0; i < stocks.length(); i++) {
                 JSONObject stock = stocks.getJSONObject(i);
                 int quantityOwned = stock.optInt("quantity_owned");
-                double currentPrice = stock.optDouble("currentPrice") + generateRandomValue(-0.5, 0.5); //CRUCIAL
+                double currentPrice = stock.optDouble("currentPrice");
                 double avgPricePerShare = stock.optDouble("stock_avg_price_per_share");
 
                 double value = quantityOwned * currentPrice;

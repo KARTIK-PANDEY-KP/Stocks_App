@@ -60,7 +60,6 @@
     import java.util.Date;
     import java.util.Locale;
     import java.util.Objects;
-    import java.util.Random;
     import java.util.concurrent.atomic.AtomicInteger;
 
     import okhttp3.MediaType;
@@ -472,7 +471,7 @@
             if (stock != null) {
                 quantityOwned = stock.getInt("quantity_owned");
                 avgPricePerShare = stock.getDouble("stock_avg_price_per_share");
-                currentPrice = stock_data_quote.getDouble("c") + generateRandomValue(-0.5, 0.5); //CRUCIAL
+                currentPrice = stock_data_quote.getDouble("c");
                 marketValue = quantityOwned * currentPrice;
                 priceChange = (currentPrice - avgPricePerShare) * quantityOwned;
             }
@@ -685,7 +684,7 @@
 
 
             try {
-                currentStockPrice = stock_data_quote.optDouble("c") + generateRandomValue(-0.5, 0.5);
+                currentStockPrice = stock_data_quote.optDouble("c");
                 Log.d("DEBUG", "Stock: + " + currentStockPrice);
                 // Now create the JSON body to send to the server
                 JSONObject requestBody = new JSONObject();
@@ -726,7 +725,7 @@
 
 
             try {
-                currentStockPrice = stock_data_quote.optDouble("c")  + generateRandomValue(-0.5, 0.5);
+                currentStockPrice = stock_data_quote.optDouble("c");
                 companyName = stock_data_general.optString("name");
                 Log.d("DEBUG", "buyStock: + " + currentStockPrice + companyName);
                 // Now create the JSON body to send to the server
@@ -1198,12 +1197,6 @@
                 // Handle the case where timestamp is not a valid number
                 return "Invalid timestamp";
             }
-        }
-        private static final Random random = new Random();
-
-        // Generates a random value between a lower bound (l) and an upper bound (h)
-        public static double generateRandomValue(double l, double h) {
-            return l + (h - l) * random.nextDouble();
         }
     }
 
