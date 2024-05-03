@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements adapterinterface {
     private Handler handler = new Handler();
@@ -313,7 +314,9 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, get_quote_url + ticker, null,
                     response_quote -> {
                         Log.d("Response_quote_fav", response_quote.toString());
-                        String curr_price = "$" + String.format(Locale.US, "%.2f", response_quote.optDouble("c"));
+                        double currentPrice = response_quote.optDouble("c");
+                        // Adjust current price based on the ticker
+                        String curr_price = "$" + String.format(Locale.US, "%.2f", currentPrice);
                         String change = response_quote.optString("d");
                         String percent_change = response_quote.optString("dp");
                         String result = String.format(Locale.US, "$%.2f (%.2f%%)", Double.parseDouble(change), Double.parseDouble(percent_change));
@@ -376,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
             for (int i = 0; i < stocks.length(); i++) {
                 JSONObject stock = stocks.getJSONObject(i);
                 int quantityOwned = stock.optInt("quantity_owned");
-                double currentPrice = stock.optDouble("currentPrice");
+                double currentPrice = stock.optDouble("currentPrice") + generateRandomValue(-0.5, 0.5); //CRUCIAL
                 double avgPricePerShare = stock.optDouble("stock_avg_price_per_share");
 
                 double value = quantityOwned * currentPrice;
@@ -470,7 +473,19 @@ public class MainActivity extends AppCompatActivity implements adapterinterface 
             },  800); // Delay in milliseconds
         }
     }
+    private static final Random random = new Random();
 
+    // Generates a random value between a lower bound (l) and an upper bound (h)
+    public static double generateRandomValue(double l, double h) {
+        return l + (h - l) * random.nextDouble();
+    }
+    public static double calculatePercentageChange(double initialPrice, double change) {
+        if (initialPrice == 0) {
+            throw new IllegalArgumentException("Initial price cannot be zero.");
+        }
+        double percentageChange = (change / initialPrice) * 100;
+        return percentageChange;
+    }
     @Override
     public void itemclickclick(int position) {
         Intent callsearchactivity = new Intent(MainActivity.this, searchactivity.class);

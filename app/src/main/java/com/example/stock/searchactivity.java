@@ -60,6 +60,7 @@
     import java.util.Date;
     import java.util.Locale;
     import java.util.Objects;
+    import java.util.Random;
     import java.util.concurrent.atomic.AtomicInteger;
 
     import okhttp3.MediaType;
@@ -256,38 +257,38 @@
             WebView webView = findViewById(R.id.recommendation);
             String recomm_url = null;
             if (Objects.equals(ticker, "NVDA")) {
-                recomm_url = "file:///android_asset/recommendation.html";
+                recomm_url = "file:///android_asset/recommendationn.html";
             }
             if (Objects.equals(ticker, "AAPL")) {
                 recomm_url = "file:///android_asset/recommendation.html";
             }
             if (Objects.equals(ticker, "QCOM")) {
-                recomm_url = "file:///android_asset/recommendation.html";
+                recomm_url = "file:///android_asset/recommendationq.html";
             }
             webView.loadUrl(recomm_url);
             WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);
 
-            WebView webView2 = findViewById(R.id.webview2);
-            webView2.loadUrl("file:///android_asset/epschart.html");
-            WebSettings webSettings2 = webView2.getSettings();
-            webSettings2.setJavaScriptEnabled(true);
-
-
 //            WebView webView2 = findViewById(R.id.webview2);
-//            String recomm_url2 = "file:///android_asset/epschart.html";
-//            if(Objects.equals(ticker, "NVDA")){
-//                recomm_url2= "file:///android_asset/epschart.html";
-//            }
-//            if(Objects.equals(ticker, "AAPL")){
-//                recomm_url2 = "file:///android_asset/epschart.html";
-//            }
-//            if(Objects.equals(ticker, "QCOM")){
-//                recomm_url2 = "file:///android_asset/epschart.html";
-//            }
-//            webView2.loadUrl(recomm_url2);
+//            webView2.loadUrl("file:///android_asset/epschart.html");
 //            WebSettings webSettings2 = webView2.getSettings();
 //            webSettings2.setJavaScriptEnabled(true);
+
+
+            WebView webView2 = findViewById(R.id.webview2);
+            String recomm_url2 = "file:///ablblabliu";
+            if(Objects.equals(ticker, "NVDA")){
+                recomm_url2= "file:///android_asset/epschartn.html";
+            }
+            if(Objects.equals(ticker, "AAPL")){
+                recomm_url2 = "file:///android_asset/epschart.html";
+            }
+            if(Objects.equals(ticker, "QCOM")){
+                recomm_url2 = "file:///android_asset/epschartq.html";
+            }
+            webView2.loadUrl(recomm_url2);
+            WebSettings webSettings2 = webView2.getSettings();
+            webSettings2.setJavaScriptEnabled(true);
             //
         }
 
@@ -471,7 +472,7 @@
             if (stock != null) {
                 quantityOwned = stock.getInt("quantity_owned");
                 avgPricePerShare = stock.getDouble("stock_avg_price_per_share");
-                currentPrice = stock_data_quote.getDouble("c");
+                currentPrice = stock_data_quote.getDouble("c") + generateRandomValue(-0.5, 0.5); //CRUCIAL
                 marketValue = quantityOwned * currentPrice;
                 priceChange = (currentPrice - avgPricePerShare) * quantityOwned;
             }
@@ -1197,6 +1198,12 @@
                 // Handle the case where timestamp is not a valid number
                 return "Invalid timestamp";
             }
+        }
+        private static final Random random = new Random();
+
+        // Generates a random value between a lower bound (l) and an upper bound (h)
+        public static double generateRandomValue(double l, double h) {
+            return l + (h - l) * random.nextDouble();
         }
     }
 
