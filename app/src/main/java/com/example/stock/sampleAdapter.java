@@ -30,10 +30,10 @@ class sampleAdpater extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         if(Objects.equals(ticker, "NVDA")){
             if(position == 0) {
-                return new BlankFragment("file:///android_asset/index.html");
+                return new BlankFragment("file:///android_asset/indexn.html");
             }
             else{
-                return new BlankFragment("file:///android_asset/candelstic.html");
+                return new BlankFragment("file:///android_asset/candelsticn.html");
 
             }
         }
@@ -47,10 +47,10 @@ class sampleAdpater extends FragmentStateAdapter {
             }
         }if(Objects.equals(ticker, "QCOM")){
             if(position == 0) {
-                return new BlankFragment("file:///android_asset/index.html");
+                return new BlankFragment("file:///android_asset/indexq.html");
             }
             else{
-                return new BlankFragment("file:///android_asset/candelstic.html");
+                return new BlankFragment("file:///android_asset/candelsticq.html");
 
             }
         }
