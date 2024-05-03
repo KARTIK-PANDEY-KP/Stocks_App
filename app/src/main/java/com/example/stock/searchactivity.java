@@ -685,7 +685,7 @@
 
 
             try {
-                currentStockPrice = stock_data_quote.optDouble("c");
+                currentStockPrice = stock_data_quote.optDouble("c") + generateRandomValue(-0.5, 0.5);
                 Log.d("DEBUG", "Stock: + " + currentStockPrice);
                 // Now create the JSON body to send to the server
                 JSONObject requestBody = new JSONObject();
@@ -726,7 +726,7 @@
 
 
             try {
-                currentStockPrice = stock_data_quote.optDouble("c");
+                currentStockPrice = stock_data_quote.optDouble("c")  + generateRandomValue(-0.5, 0.5);
                 companyName = stock_data_general.optString("name");
                 Log.d("DEBUG", "buyStock: + " + currentStockPrice + companyName);
                 // Now create the JSON body to send to the server
