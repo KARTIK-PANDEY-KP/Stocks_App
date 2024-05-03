@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_coreners"
     android:padding="16dp">
 
     <!-- ImageView with rounded corners -->
 
 
     <ImageView
-    android:id="@+id/newsImage"
-    android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:src="@drawable/search"
-    android:scaleType="centerCrop"
-    android:layout_marginBottom="8dp"
-    android:background="@drawable/rounded_coreners" />
+        android:id="@+id/newsImage"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/rounded_coreners"
+        android:scaleType="fitCenter"
+        android:src="@drawable/search" />
 
 
     <!-- LinearLayout for holding two TextViews side by side -->
@@ -59,7 +60,6 @@
         android:layout_below="@+id/linearLayout"
         android:layout_alignStart="@+id/linearLayout"
         android:layout_marginTop="11dp"
-        android:background="@drawable/rounded_coreners"
         android:padding="8dp"
 
         android:singleLine="true"
