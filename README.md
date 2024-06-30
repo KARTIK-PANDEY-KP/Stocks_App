@@ -27,6 +27,7 @@
 
 - **Frontend Development**:
   - **Technology**: Android Studio and Java.
+
   - **UI/UX Design**: Created a seamless user experience with an intuitive UI.
 
 ### Skills
@@ -34,3 +35,4 @@
 - **Development**: Android Development, Android SDK, Node.js, Express.js
 - **Cloud Platforms**: Google Cloud Platform (GCP), Google App Engine, Amazon Web Services (AWS), Microsoft Azure
 - **Other**: Portfolio Management, UI/UX Design, Stock Management, Mobile Application Development
+![Screenshot from 2024-06-28 23-23-24](https://github.com/KARTIK-PANDEY-KP/Stocks_App/assets/57026147/29e3dbcc-2787-4c48-a7cb-bedbba02afa1)
