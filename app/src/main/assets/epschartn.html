@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPS Data Chart</title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="epsChart" style="width:100%; height:400px;"></div>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const apiUrl = 'https://nodeserverass3.wl.r.appspot.com/epsinfo/?text=NVDA';
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const categories = data.map(item => `${item.period} <br/>Surprise: ${item.surprise.toFixed(4)}`);
+                    const actualData = data.map(item => item.actual);
+                    const estimateData = data.map(item => item.estimate);
+
+                    Highcharts.chart('epsChart', {
+                        chart: {
+                            type: 'spline',
+                            backgroundColor: "#FAFAFA"
+                        },
+                        title: {
+                            text: 'Historical EPS Surprises'
+                        },
+                        xAxis: {
+                    categories: categories,
+                    labels: {
+                        rotation: -45,
+                        style: {
+                            fontSize: '13px'
+                        }
+                    }
+                },
+                        yAxis: {
+                            title: {
+                                text: 'Quarterly EPS'
+                            }
+                        },
+                        tooltip: {
+                            shared: true,
+                        },
+                        plotOptions: {
+                            series: {
+                                label: {
+                                    connectorAllowed: false
+                                },
+                                pointStart: categories[0] ? 0 : undefined
+                            }
+                        },
+                        series: [{
+                            name: 'Actual',
+                            data: actualData,
+                            color: 'blue'
+                        }, {
+                            name: 'Estimate',
+                            data: estimateData,
+                            color: 'purple'
+                        }],
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        },
+                        exporting: {
+                            enabled: true
+                        },
+                        responsive: {
+                            rules: [{
+                                condition: {
+                                    maxWidth: 500
+                                },
+                                chartOptions: {
+                                    legend: {
+                                        layout: 'horizontal',
+                                        align: 'center',
+                                        verticalAlign: 'bottom'
+                                    }
+                                }
+                            }]
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading the data: ', error));
+        });
+    </script>
+</body>
+</html>

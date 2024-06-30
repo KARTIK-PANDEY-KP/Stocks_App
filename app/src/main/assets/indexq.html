@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCOM Stock Price Chart</title>
+    <!-- Highcharts Script -->
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <!-- CSS for the container -->
+    <style>
+        #container {
+            height: 100%;
+            min-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div> <!-- Container for the chart -->
+    <script>
+        async function getStockData(stockName) {
+            const url = `https://nodeserverass3.wl.r.appspot.com/stockdata/?stock_name=${stockName}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                return data.results.map(item => [item.t, item.c]); // assuming 't' is a timestamp in seconds, convert to milliseconds
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+            }
+        }
+        async function getStockData2(stockName) {
+        const url = `https://nodeserverass3.wl.r.appspot.com/quote/?text=${stockName}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            // Assuming the response structure includes 'dp' for daily percentage change
+            const stockStatus = data.dp < 0 ? 0 : 1; // 0 for negative change, 1 for positive
+            const stockColor = stockStatus === 1 ? 'green' : 'red';
+            return {
+                stockStatus,
+                stockColor
+            };
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+}
+        (async () => {
+            // Load the dataset
+            const data = await getStockData('QCOM');
+            const stockData = await getStockData2 ('LCID');
+
+
+            // Create the chart if data is available
+            if (data && stockData) {
+                Highcharts.stockChart('container', {
+                    rangeSelector: {
+                        selected: 1
+                    },
+                   navigator: {
+                        enabled: false  // This disables the navigator
+                   },
+                   exporting: {
+                    enabled: false
+                   },
+                   rangeSelector: {
+                        enabled: false  // Disables the range selector
+                    },
+                    navigator: {
+                        enabled: false  // Disables the range selector
+                    },
+                    title: {
+                        text: 'QCOM hourly Price Variation'
+                    },
+                    series: [{
+                        name: 'QCOM',
+                        data: data,
+                        type: 'spline',
+                        color: stockData.stockColor,
+                        tooltip: {
+                            valueDecimals: 2
+                        }
+                    }]
+                });
+            } else {
+                console.error('Failed to load the stock data.');
+            }
+        })();
+    </script>
+</body>
+</html>
